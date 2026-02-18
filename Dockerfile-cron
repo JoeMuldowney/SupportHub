@@ -1,0 +1,34 @@
+FROM php:8.2-cli
+
+# Install cron
+RUN apt-get update && apt-get install -y cron \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copy email script
+COPY cron_app/email.php cron_app/composer.json /app/
+
+# Copy db connection
+COPY core/connection.php /app/
+
+# Install cron container dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Ensure log folder exists
+RUN mkdir -p /var/log/cron && chmod 777 /var/log/cron
+
+# Copy cron job config
+COPY cron_app/cronjob /etc/cron.d/email-cron
+RUN chmod 0644 /etc/cron.d/email-cron \
+    && crontab /etc/cron.d/email-cron
+
+
+# Run cron in foreground
+CMD ["cron", "-f"]

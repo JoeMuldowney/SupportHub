@@ -1,0 +1,10 @@
+secrets/
+
+tests/
+
+vendor/
+
+phpunit.xml
+
+*.ini
+.phpunit.result.cache

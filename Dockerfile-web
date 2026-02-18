@@ -1,0 +1,50 @@
+# Use PHP with Apache
+FROM php:8.2-apache
+
+# Set Apache root to public folder
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
+# Update Apache config for new document root
+RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/000-default.conf
+
+# Enable .htaccess support
+RUN a2enmod rewrite
+
+# Install system dependencies needed by Composer & PHP libs
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    zip \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copy custom 000-default.conf to the container to make the filepath to images accessiable
+COPY ./000-default.conf /etc/apache2/sites-available/000-default.conf
+
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy only composer files first (for caching)
+COPY composer.json /var/www/html/
+
+# Install PHP dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+
+# Copy folders individually
+COPY app/ ./app/
+COPY core/ ./core/
+COPY public/ ./public/
+
+
+# Create storage folder and set ownership for images
+RUN mkdir -p /var/lib/tickets/data \
+    && chown -R www-data:www-data /var/lib/tickets
+
+RUN chown -R www-data:www-data /var/www/html

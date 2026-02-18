@@ -1,0 +1,69 @@
+services:
+  # Main web application container
+  web-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-web      
+    image: support-hub:1
+    restart: unless-stopped # restart unless containers are stopped manually
+    container_name: supporthub
+    ports:
+      - "80:80" # map host port 80 to container port 80
+    volumes:
+      # Persistent storage for uploaded ticket images
+      - stored_images:/var/lib/tickets/data
+       # Secret files for database credentials
+      - ./secrets/db_pass:/run/secrets/db_pass:ro
+      - ./secrets/db_host:/run/secrets/db_host:ro
+      - ./secrets/db_name:/run/secrets/db_name:ro
+      - ./secrets/db_user:/run/secrets/db_user:ro
+      - ./secrets/calendar.json:/run/secrets/calendar.json:ro
+    depends_on:
+      - mysql # ensure database container starts first
+
+  # Email/cron service container 
+  email-app:
+    build:
+      context: .
+      dockerfile: Dockerfile-cron
+    image: support-hub-email-service:1
+    restart: unless-stopped
+    container_name: supporthubemailservice
+    volumes:
+       # Secret files for database credentials
+      - ./secrets/db_pass:/run/secrets/db_pass:ro
+      - ./secrets/db_host:/run/secrets/db_host:ro
+      - ./secrets/db_name:/run/secrets/db_name:ro
+      - ./secrets/db_user:/run/secrets/db_user:ro      
+    depends_on:
+      - mysql # ensure database container starts first
+
+    # MySQL database container
+  mysql:
+    image: mysql:8.0
+    container_name: ticket_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_pass
+      MYSQL_DATABASE_FILE: /run/secrets/db_name
+      MYSQL_USER_FILE: /run/secrets/db_user
+      MYSQL_PASSWORD_FILE: /run/secrets/db_pass
+    ports:
+      - "3307:3306" # expose container DB port to host port 3307
+    volumes:
+      # Persistent database storage
+      - mysql_data:/var/lib/mysql
+      # Initial SQL script to create tables if db does not exist
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql:ro
+       # Secret files for database credentials
+      - ./secrets/db_pass:/run/secrets/db_pass:ro
+      - ./secrets/db_host:/run/secrets/db_host:ro
+      - ./secrets/db_name:/run/secrets/db_name:ro
+      - ./secrets/db_user:/run/secrets/db_user:ro
+      - ./secrets/db_root_pass:/run/secrets/db_root_pass:ro
+
+# Named volumes for persistent storage
+volumes:
+  stored_images: # store uploaded ticket images
+  mysql_data: # store MySQL database files
+ 

@@ -1,0 +1,20 @@
+# Enable Apache's mod_rewrite engine for URL rewriting
+RewriteEngine On
+
+
+# Prevents Apache from rewriting requests that point to actual existing files (like images, CSS, JS, etc.), so they load normally.
+# If the requested file does not exist...
+RewriteCond %{REQUEST_FILENAME} !-f
+# ...and if the requested directory does not exist...
+RewriteCond %{REQUEST_FILENAME} !-d
+# ...redirect all requests to index.php while preserving query string (QSA) and stopping further rewrite processing (L)
+RewriteRule ^ index.php [QSA,L]
+
+# Set PHP configuration values for this directory
+
+# Maximum size for uploaded files
+php_value upload_max_filesize 20M
+# Maximum size of POST data (includes file uploads)
+php_value post_max_size 30M
+# Maximum amount of memory a script can consume
+php_value memory_limit 128M
