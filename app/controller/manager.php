@@ -27,12 +27,13 @@ class ManagerController{
      * Behavior:
      * - Restricts access to users with role >= 1 (manager/admin)
      * - Retrieves all "new users" within the manager's department
+     * - Retrieves all "new users" for admins
      * - Loads the manager dashboard view
      *
      * Session Requirements:
-     * - $_SESSION['role'] must be >= 1
+     * - $_SESSION['role'] must be == 1 (manager) or 3 (admin)
      * - $_SESSION['dept'] must be set
-     *
+     * 
      * Side Effects:
      * - Redirects to /login if unauthorized
      * - Loads view: /view/manager_dashboard.php
@@ -47,10 +48,20 @@ class ManagerController{
             header("Location: /login");
             exit;
         } 
-        $dept = $_SESSION['dept'];
+        if ($_SESSION['role'] === 1) {
+            $dept = $_SESSION['dept'];
         
-        $users = (new NewUserDB)->getAllNewUsersByDept($dept) ?? [];
+            $users = (new NewUserDB)->getAllNewUsersByDept($dept) ?? [];
+            
+        }
+
+        if ($_SESSION['role'] === 3) {            
+        
+            $users = (new NewUserDB)->getAllNewUsers() ?? [];
+            
+        }
         include __DIR__ . '/../view/manager_dashboard.php';
+
     }
 
         /**
