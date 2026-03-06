@@ -22,6 +22,8 @@
 
 class NewUser {
     private int $user_id;    
+    private $emailGroups = []; 
+    private $xDriveFolders = []; 
     
     public function __construct(
         private string $fname,
@@ -149,6 +151,44 @@ class NewUser {
     public function setDots($val) {
         $this->dots = $val;
     }
+
+        //method to add email names to the emailGroups array
+    public function addEmail(string $emailName): void
+    {
+        $this->emailGroups[] = $emailName;
+    }
+
+    //method to get all email names associated with the user
+    public function getEmailGroups(): array
+    {
+        return $this->emailGroups;
+    }
+
+    //method to clear all email names from the emailGroups array
+    public function clearEmailGroups(): void
+    {
+        $this->emailGroups = [];
+    }   
+
+    
+        //method to add xDrive folder names to the xDriveFolders array
+    public function addXFolder(string $xDriveFolder): void
+    {
+        $this->xDriveFolders[] = $xDriveFolder;
+    }
+
+    //method to get all xDrive folder names associated with the user
+    public function getXDriveFolders(): array
+    {
+        return $this->xDriveFolders;
+    }
+
+    //method to clear all xDrive folder names from the xDriveFolders array
+    public function clearXDriveFolders(): void
+    {
+        $this->xDriveFolders = [];
+    }  
+   
 
 }
 ?>

@@ -55,6 +55,8 @@ class NewUserController{
     $supervisor = $_POST['supervisor'];
     $location = (int)$_POST['location'];
     $hours = (float)$_POST['hours'];
+    $emailGroups = $_POST['emailGroups'] ?? [];
+    $xDriveFolders = $_POST['xDriveFolders'] ?? [];
 
     $position = $_POST['workType-add'];
     if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
@@ -70,14 +72,32 @@ class NewUserController{
     $dots = isset($_POST['dots']) ? 'yes' : '';   
     $shadow_agent = isset($_POST['shadowagent']) ? 'yes' : '';
 
-    $user = new NewUser($fname, $lname, $email, $pname, $supervisor, $location, $dept, $title, $position, $hours, $sdate, $avaya, $shadow_agent, $ecirts, $dots);  
+    $user = new NewUser($fname, $lname, $email, $pname, $supervisor, $location, $dept, $title, $position, $hours, $sdate, $avaya, $shadow_agent, $ecirts, $dots); 
+    
+    // Add Email Groups
+    foreach ($emailGroups as $group) {
+        $group = trim($group);
+        if ($group !== '') {
+            $user->addEmail($group);
+        }
+    }
+
+    // Add X Drive Folders
+    foreach ($xDriveFolders as $folder) {
+        $folder = trim($folder);
+        if ($folder !== '') {
+            $user->addXFolder($folder);
+        }
+    }
+
     $newUserDB = new NewUserDB();
 
     $user_id = $newUserDB->addNewSccUser($user);
+    $newUserDB->addGroupsXFolders($user->getEmailGroups(), $user->getXDriveFolders(), $user_id);
       
 
         if($user_id){
-            
+            $sccUserId = $user_id; // Assuming addNewSccUser returns the new user's ID
             $priority = 'Medium';
             $status = 'new';            
             $category = 'New Hire';           
@@ -89,7 +109,7 @@ class NewUserController{
             //Create task object
             $user_desc = sprintf(
                 "%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s",
-                "User Id:", $user_id,
+                "Id:", $sccUserId,
                 "Name:", "$fname $lname",
                 "Preferred Name:", $pname,
                 "Department:", $dept,
@@ -102,7 +122,7 @@ class NewUserController{
             
             $task = new task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
             $taskdb = new TaskDB();            
-            $new_ticket = $taskdb->addTask($task);
+            $new_ticket = $taskdb->addTask($task, $sccUserId);
 
             header("Location: /dashboard");
             exit;
@@ -112,7 +132,7 @@ class NewUserController{
         $_SESSION['error'] = 'Error creating user';
         header("Location: /manager_dashboard.php");
         exit;
-        }
+    }
 
 
 
@@ -151,6 +171,8 @@ class NewUserController{
         $position = $_POST['workType-update'];
         $hours = (float)$_POST['hours-update'];
         $sdate = $_POST['sdate-update'];
+        $emailGroups = $_POST['emailGroups'] ?? [];
+        $xDriveFolders = $_POST['xDriveFolders'] ?? [];
 
         if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
             $hours = 37.5;
@@ -165,45 +187,60 @@ class NewUserController{
 
         $userDB = new NewUserDB();
         $userInfo = $userDB->findUserById($id);
-
+        
         if($userInfo){
             $updatedUser = new NewUser($fname, $lname, $email, $pname, $supervisor, $location, $dept, $title, $position, $hours, $sdate, $avaya, $shadow_agent, $ecirts, $dots);
             $userRow = $userDB->updateSccUser($id, $updatedUser);
+                // Add Email Groups
+                foreach ($emailGroups as $group) {
+                    $group = trim($group);
+                    if ($group !== '') {
+                        $updatedUser->addEmail($group);
+                    }
+                }
+
+                // Add X Drive Folders
+                foreach ($xDriveFolders as $folder) {
+                    $folder = trim($folder);
+                    if ($folder !== '') {
+                        $updatedUser->addXFolder($folder);
+                    }
+                }
+            $userDB->updateGroupsXFolders($updatedUser->getEmailGroups(), $updatedUser->getXDriveFolders(), $id);             
               
-        }        
       
-        if ($userRow) {
-                $priority = 'Medium';
-                $status = 'new';
+        
+            $priority = 'Medium';
+            $status = 'new';
             
-                $category = 'Update SCC User';       
-                $date_opened= (new DateTime())->format("Y-m-d");
+            $category = 'Update SCC User';       
+            $date_opened= (new DateTime())->format("Y-m-d");
               
-                $user_id = $_SESSION['user_id'];
-                $user_email = $_SESSION['email'];
-                $manager = $_SESSION['manager_email'] ?? '';
+            $user_id = $_SESSION['user_id'];
+            $user_email = $_SESSION['email'];
+            $manager = $_SESSION['manager_email'] ?? '';
 
-                $user_desc = sprintf(
-                    "%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s",
-                    "User Id:", $id,
-                    "Name:", "$fname $lname",
-                    "Preferred Name:", $pname,
-                    "Department:", $dept,
-                    "Title:", $title,
-                    "Supervisor:", $supervisor,
-                    "Office Location:", $location,
-                    "Position Type:", $position,
-                    "Start Date:", $sdate
-                );
-                //Create task object
-                
-                $task = new task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
-                $taskdb = new TaskDB();            
-                $new_ticket = $taskdb->addTask($task);
+            $user_desc = sprintf(
+                "%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s",
+                "Id:", $id,
+                "Name:", "$fname $lname",
+                "Preferred Name:", $pname,
+                "Department:", $dept,
+                "Title:", $title,
+                "Supervisor:", $supervisor,
+                "Office Location:", $location,
+                "Position Type:", $position,
+                "Start Date:", $sdate
+            );
+            //Create task object
+            
+            $task = new Task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
+            $taskdb = new TaskDB();            
+            $new_ticket = $taskdb->addTask($task);
 
-                $_SESSION['result'] = "Updated Successfully.";
-                header("Location: /userPanel");
-                exit;        
+            $_SESSION['result'] = "Updated Successfully.";
+            header("Location: /userPanel");
+            exit;        
             }
 
             $_SESSION['error'] = 'Invalid user';
@@ -254,7 +291,7 @@ class NewUserController{
         $manager = $_SESSION['manager_email'] ?? '';
         $user_desc = sprintf(
         "%-21s %s\n%-21s %s\n%-21s %s\n%-21s %s",
-        "User Id:", $id,
+        "Id:", $id,
         "Name:", "$fname $lname",
         "Termination Date:", $tDate,
         "Termination Time:", $tTime,

@@ -84,6 +84,7 @@ CREATE TABLE email (
   solution TEXT DEFAULT NULL,
   email_counter INT DEFAULT NULL,
   ticket_num INT DEFAULT NULL,
+  user_id INT DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
@@ -110,6 +111,43 @@ CREATE TABLE scc_user (
   ecirts VARCHAR(5) DEFAULT NULL,
   dots VARCHAR(5) DEFAULT NULL,
   PRIMARY KEY (id)
+) ENGINE=InnoDB;
+
+-- =========================
+-- SCC USER Groups & Folders TABLE
+-- =========================
+DROP TABLE IF EXISTS groups_folders;
+
+CREATE TABLE groups_folders (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  email VARCHAR(225) DEFAULT NULL,
+  xdrive VARCHAR(225) DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY (user_id),
+  CONSTRAINT fk_groups_folders_user
+    FOREIGN KEY (user_id)
+    REFERENCES scc_user(id)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- =========================
+-- Ticket Comment History TABLE
+-- =========================
+DROP TABLE IF EXISTS comment_history;
+
+CREATE TABLE comment_history (
+  id INT NOT NULL AUTO_INCREMENT,
+  ticket_id INT NOT NULL, 
+  email VARCHAR(225) DEFAULT NULL,
+  comment VARCHAR(225) DEFAULT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY (ticket_id),
+  CONSTRAINT fk_comment_history_ticket
+    FOREIGN KEY (ticket_id)
+    REFERENCES task(id)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 

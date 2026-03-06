@@ -208,11 +208,21 @@ class TaskController
 		}
     }
 
-        /**
-     * Adds a solution/closure note to a task.
+    /**
+     * Adds a solution or comment to a task depending on status.
      *
-     * Restrictions:
-     * - Only role 3 (admin) allowed
+     * Behavior:
+     * - If ticket status is 'completed', records a solution and closes task.
+     * - Otherwise, adds a standard comment to task history.
+     *
+     * Input (POST):
+     * - ticketNum: ID of the task
+     * - solution: text of solution or comment
+     * - ticketStatus: task status (e.g., completed)
+     *
+     * Notes:
+     * - Redirects to dashboard after processing
+     * - Session email is used as commenter when adding comments
      */
     public function addSolution(): void {
 
@@ -220,18 +230,25 @@ class TaskController
 		$id = $_POST['ticketNum'];
 		$solution = $_POST['solution'];
         $status = $_POST['ticketStatus'];
+        $userEmail = $_SESSION['email'] ?? '';
         
-		if ($user_role == 3) {                       
+        if($status === 'completed'){                    
 			
             (new TaskDB())->addTaskSolution($id, $solution, $status);
-            $_SESSION['solution'] = $solution;
+            
+            header("Location: /dashboard");
+            exit;
+        }else{
+            (new TaskDB())->addTaskComment($id, $solution, $userEmail);
             header("Location: /dashboard");
             exit;
         }
 
+
         $_SESSION['error'] = 'error adding solution';
         header("Location: /dashboard");
-	}
+	
+    }
 
     /**
      * Returns all tasks (admin view).
@@ -242,6 +259,29 @@ class TaskController
         return $tasks;
 
 
+    }
+
+        /**
+     * Returns comment history for a specific ticket in JSON format.
+     *
+     * Input (POST):
+     * - ticketNum: ID of the ticket
+     *
+     * Output:
+     * - JSON array of comment history records
+     *
+     * Notes:
+     * - Used by the history modal step
+     * - Exits after JSON output to prevent extra output
+     */
+    public function showTaskHistory(): array {
+        $id = $_POST['ticketNum'];
+ 
+        $comments = (new TaskDB())->getTaskCommentHistory($id);
+        
+        header('Content-Type: application/json');
+        echo json_encode($comments);
+        exit;
     }
     
 }

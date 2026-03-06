@@ -92,7 +92,7 @@
 <!-- Submits to controller route: ticket/add -->
 <!-- Supports file upload (multipart/form-data) -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="add_ticket_and_send_email" action="ticket/add" method="POST"  enctype="multipart/form-data">
       <div class="modal-header">
         <h5 class="modal-title" id="formModalLabel">Add New Ticket</h5>
@@ -177,38 +177,57 @@ Modal: View Ticket Details
 - Submits solution to: solution/add
 -->
 <div class="modal fade" id="viewTaskModal" tabindex="-1" aria-labelledby="viewTaskModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" id="ticketDetailsPage">
       <form id="update_ticket_and_send_email" action="solution/add" method="POST" enctype="multipart/form-data">
         <div class="modal-body">
-          <p><strong>Ticket:</strong> <span id="ticketNumber" ></span></p>
-          <p><strong>Category:</strong> <span id="viewCategory"></span></p>
-          <p><strong>Location:</strong> <span id="viewLocation"></span></p>
-          <p><strong>Priority:</strong> <span id="viewPriority"></span></p>
-          <p><strong>Description:</strong> <span id="viewDesc"></span></p>
-          <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
-          <p><strong>Status:</strong> <span id="viewStatus"></span></p>
-          <p><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
-          <p><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
-          <p><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
-          <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
-          <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
-          <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
-          <p><strong>Solution:</strong> <span id="solutionProgress"></span></p>         
-          
+          <!-- STEP 1 : Ticket Details -->
+          <div id="step1">
 
-          <div class="mt-4">
-            <label for="solution" class="form-label">Solution for the problem</label>
-            <textarea id="solution" name="solution" class="form-control" rows="5"></textarea>
+            <p><strong>Ticket:</strong> <span id="ticketNumber"></span></p>
+            <p><strong>Category:</strong> <span id="viewCategory"></span></p>
+            <p><strong>Location:</strong> <span id="viewLocation"></span></p>
+            <p><strong>Priority:</strong> <span id="viewPriority"></span></p>
+            <p><strong>Description:</strong> <span id="viewDesc"></span></p>
+            <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
+            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+            <p><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
+            <p><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
+            <p><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
+            <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
+            <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
+            <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
+            <p><strong>Comment:</strong> <span id="solutionProgress"></span></p>
+
+            <div class="mt-4">
+              <label for="solution" class="form-label">Add Comment</label>
+              <textarea id="solution" name="solution" class="form-control" rows="5"></textarea>
+            </div>
+
+          </div>
+
+
+          <!-- STEP 2 : HISTORY -->
+          <div id="step2" style="display:none;">
+
+            <h5 class="mb-3">Ticket History</h5>
+
+            <div id="historyContainer" class="border rounded p-3" style="max-height:400px; overflow-y:auto;">
+              Loading history...
+            </div>
+
           </div>
         </div>
         
         <div class="modal-footer">
           <input type="hidden" id="ticketNumberValue" name="ticketNum">
           <input type="hidden" id="ticketStatusValue" name="ticketStatus">
-          <button type="button"  class="btn btn-success"  data-bs-toggle="modal" data-bs-target="#addToCalender">Set Reminder</button>
+          <button type="button" id="viewHistoryBtn" onclick="nextStep()" class="btn btn-info">View History</button>
+          <button type="button" id="backButton" onclick="prevStep()" class="btn btn-secondary" style="display:none;">Back</button>
+          <button type="button" id="reminderBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addToCalender">Set Reminder</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Add</button>
+          <button type="submit" id="addBtn" class="btn btn-primary">Add</button>
+          
         </div>
       </form>
     </div>
@@ -572,6 +591,108 @@ document.addEventListener('DOMContentLoaded', () => {
             input.files = dt.files;
         });
     });
+});
+/**
+ * Advances modal to step 2 (history view).
+ *
+ * Behavior:
+ * - Hides step 1 content
+ * - Shows step 2 history content
+ * - Displays back button
+ * - Hides action buttons
+ * - Fetches and renders ticket history
+ */
+function nextStep() {
+
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
+
+    document.getElementById("backButton").style.display = "inline-block";
+
+        // Hide these buttons
+    document.getElementById("viewHistoryBtn").style.display = "none";
+    document.getElementById("reminderBtn").style.display = "none";
+    document.getElementById("addBtn").style.display = "none";
+
+    let ticketNum = document.getElementById("ticketNumberValue").value;
+
+    fetch("ticket/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "ticketNum=" + encodeURIComponent(ticketNum)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        let container = document.getElementById("historyContainer");
+        container.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            container.innerHTML = "<p>No history found.</p>";
+            return;
+        }
+
+        data.forEach(row => {
+
+            container.innerHTML += `
+                <div class="border-bottom mb-2 pb-2">
+                    <strong>${row.commented_by ?? 'Unknown'}</strong>
+                    <span class="text-muted"> - ${row.timestamp ?? ''}</span>
+                    <div>${row.comment ?? ''}</div>
+                </div>
+            `;
+
+        });
+
+    });
+
+}
+/**
+ * Returns modal to step 1 (details view).
+ *
+ * Behavior:
+ * - Hides history step
+ * - Shows details step
+ * - Hides back button
+ * - Restores action buttons
+ */
+function prevStep(){
+
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step1").style.display = "block";
+
+    document.getElementById("backButton").style.display = "none";
+
+        // Show buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+    document.getElementById("reminderBtn").style.display = "inline-block";
+    document.getElementById("addBtn").style.display = "inline-block";
+
+}
+
+/**
+ * Resets modal to initial state when closed.
+ *
+ * Behavior:
+ * - Returns to step 1
+ * - Hides step 2
+ * - Hides back button
+ * - Restores action buttons
+ */
+document.getElementById('viewTaskModal').addEventListener('hidden.bs.modal', function () {
+
+    // Reset steps
+    document.getElementById("step1").style.display = "block";
+    document.getElementById("step2").style.display = "none";
+
+    // Hide back button
+    document.getElementById("backButton").style.display = "none";
+
+    // Show action buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+    document.getElementById("reminderBtn").style.display = "inline-block";
+    document.getElementById("addBtn").style.display = "inline-block";
+
 });
 </script>
 </body>

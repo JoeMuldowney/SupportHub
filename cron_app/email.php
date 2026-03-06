@@ -57,6 +57,7 @@ class Email {
         $mail->SMTPAuth   = false; 
         $mail->Port       = $this->mail_port;
         $mail->SMTPSecure = 'tls';
+        $mail->isHTML(true);
 
         // Set sender and recipients
         $mail->setFrom('mis@sccmail.org', 'MIS');
@@ -79,13 +80,13 @@ class Email {
 
     try{
 
-    // Fetch all new tickets that haven't been emailed yet
-    $stmt = $this->pdo->prepare("SELECT * FROM email WHERE email_counter = ? AND status = ?");
+    // Fetch all new tickets that haven't been emailed yet add group and xDrive info
+    $stmt = $this->pdo->prepare("SELECT e.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM email e LEFT JOIN groups_folders g ON e.user_id = g.user_id WHERE e.email_counter = ? AND e.status = ? GROUP BY e.id");
     $stmt->execute([0,'new']);
 	$new_tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Fetch completed tickets that need closure emails sent
-    $stmt = $this->pdo->prepare("SELECT * FROM email WHERE email_counter = ? AND status = ?");
+    $stmt = $this->pdo->prepare("SELECT e.* , GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM email e LEFT JOIN groups_folders g ON e.user_id = g.user_id WHERE e.email_counter = ? AND e.status = ? GROUP BY e.id");
     $stmt->execute([1,'completed']);
 	$finished_tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -113,6 +114,22 @@ class Email {
         $category = $emailInfo['category'] ?? '';
         $solution = $emailInfo['solution'] ?? '';
         $ticket_number = $emailInfo['ticket_num'] ?? '';
+        $emailGroups = $emailInfo['emailGroups'] ?? '';
+        $xDriveFolders = $emailInfo['xDriveFolders'] ?? '';
+
+        
+
+        $emailGroupsFormatted = '';
+        if (!empty($emailGroups)) {
+            $groupsArray = explode(',', $emailGroups);
+            $emailGroupsFormatted = implode("<br>", $groupsArray);
+        }
+
+        $xDriveFormatted = '';
+        if (!empty($xDriveFolders)) {
+            $foldersArray = explode(',', $xDriveFolders);
+            $xDriveFormatted = implode("<br>", $foldersArray);
+        }
 
         $mail = $this->createMailer();
         $mail->addAddress($user_email);
@@ -122,98 +139,152 @@ class Email {
         }
 
             if($category === 'New Hire'){
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
+                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+                //$mail->addAddress('laurie.rodriguez@sccmail.org');
                 $mail->Subject = "Support Hub New Hire Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
-We've received your new hire support ticket and are working on it.
+<p style='font-size:16px;'>
+    We've received your new hire support ticket and are working on it.
+</p>
+<p style='font-size:16px;'>
+<span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
 
-Ticket details:
-Category: $category
-Location: $location
-Priority: $priority
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$formatted_desc</span>
+</p>
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
+    <span style='font-size:16px;'>$emailGroupsFormatted</span>
+</p>
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
+    <span style='font-size:16px;'>$xDriveFormatted</span>
+</p>
 
-Description: 
-$description
-
-            
-
+<p style='font-size:16px;'>
 You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
-
+</p>
+<p style='font-size:16px;'>
 Thank you for using Support Hub.
-
+</p>
+<p style='font-size:16px;'>
 MIS Department
-Senior Connection Center";    
+Senior Connection Center
+</p>";   
 
             }
             else if($category === 'Update SCC User'){
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
+                //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->Subject = "Support Hub Update SCC User Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
+<p style='font-size:16px;'>
 We've received your update SCC user support ticket and are working on it.
+</p>
 
-Ticket details:
-Category: $category
-Location: $location
-Priority: $priority
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
 
-Description: 
-$description
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$formatted_desc</span>
+</p>
+
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
+    <span style='font-size:16px;'>$emailGroupsFormatted</span>
+</p>
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
+    <span style='font-size:16px;'>$xDriveFormatted</span>
+</p>
 
             
 
+<p style='font-size:16px;'>
 You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
-
+</p>
+<p style='font-size:16px;'>
 Thank you for using Support Hub.
-
+</p>
+<p style='font-size:16px;'>
 MIS Department
-Senior Connection Center";    
+Senior Connection Center
+</p>";  
 
             }
             else if($category === 'Termination'){
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
+                //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->Subject = "Support Hub Termination Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
+<p style='font-size:16px;'>
 We've received your termination support ticket and are working on it.
+</p>
 
-Ticket details:
-Category: $category
-Location: $location
-Priority: $priority
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
 
-Description: 
-$description
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$formatted_desc</span>
+</p>
 
             
-
+<p style='font-size:16px;'>
 You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
-
+</p>
+<p style='font-size:16px;'>
 Thank you for using Support Hub.
-
+</p>
+<p style='font-size:16px;'>
 MIS Department
-Senior Connection Center";    
+Senior Connection Center
+</p>";    
 
             }
             else{
                 $mail->Subject = "Support Hub Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
+<p style='font-size:16px;'>
 We've received your support ticket and are working on it.
+</p>
 
-Ticket details:
-Category: $category
-Location: $location
-Priority: $priority
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
 
-Description: 
-$description
-
+<p style='font-size:16px;'>
+    <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$description</span>
+</p>
         
-
+<p style='font-size:16px;'>
 You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
-
+</p>
+<p style='font-size:16px;'>
 Thank you for using Support Hub.
-
+</p>
+<p style='font-size:16px;'>
 MIS Department
-Senior Connection Center"; 
+Senior Connection Center
+</p>";  
                 }   
 
         try {
@@ -254,31 +325,82 @@ Senior Connection Center";
         if(!empty($user_manager)){
             $mail->addAddress($user_manager);
         }
+        $mail->Subject = "Support Hub Ticket Closed - Ticket #$ticket_number";
         if($category === 'New Hire' || $category === 'Update SCC User' || $category === 'Termination'){
-            $mail->addAddress('laurie.rodriguez@sccmail.org');
-        }
-        
-            $mail->Subject = "Support Hub Ticket Closed - Ticket #$ticket_number";
+            //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                            $mail->Body    = "
+<p style='font-size:16px;'>
+We've received your update SCC user support ticket and are working on it.
+</p>
+
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
+
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$formatted_desc</span>
+</p>
+
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
+    <span style='font-size:16px;'>$emailGroupsFormatted</span>
+</p>
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
+    <span style='font-size:16px;'>$xDriveFormatted</span>
+</p>
+
+            
+
+<p style='font-size:16px;'>
+You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+</p>
+<p style='font-size:16px;'>
+Thank you for using Support Hub.
+</p>
+<p style='font-size:16px;'>
+MIS Department
+Senior Connection Center
+</p>";  
+}else {
+                 
 
             $mail->Body    = "
+<p style='font-size:16px;'>
 We've resolved your support ticket.
+</p>
 
-Ticket details:
-Category: $category
-Location: $location
-Priority: $priority
+<p style='font-size:16px;'>
+    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
+    Category: $category<br>
+    Location: $location<br>
+    Priority: $priority
+</p>
+<p style='font-size:16px;'>
+    <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
+    <span style='font-size:16px;'>$description</span>
+</p>
 
-Description: $description
+<p style='font-size:16px;'>
+    <span style='font-size:16px; font-weight:bold;'>Solution:</span><br>
+    <span style='font-size:16px;'>$solution</span>
+</p>
 
-Solution: $solution
-
-If you have any further issues, please don't hesitate to submit a new ticket.
-
+<p style='font-size:16px;'>
+You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+</p>
+<p style='font-size:16px;'>
 Thank you for using Support Hub.
-
+</p>
+<p style='font-size:16px;'>
 MIS Department
-Senior Connection Center";    
-
+Senior Connection Center
+</p>";    
+}
         try {
             // Attempt to send email
             if($mail->send()){
