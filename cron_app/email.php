@@ -326,7 +326,22 @@ Senior Connection Center
             $mail->addAddress($user_manager);
         }
         $mail->Subject = "Support Hub Ticket Closed - Ticket #$ticket_number";
+
         if($category === 'New Hire' || $category === 'Update SCC User' || $category === 'Termination'){
+
+        $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+        
+        $emailGroupsFormatted = '';
+        if (!empty($emailGroups)) {
+            $groupsArray = explode(',', $emailGroups);
+            $emailGroupsFormatted = implode("<br>", $groupsArray);
+        }
+
+        $xDriveFormatted = '';
+        if (!empty($xDriveFolders)) {
+            $foldersArray = explode(',', $xDriveFolders);
+            $xDriveFormatted = implode("<br>", $foldersArray);
+        }
             //$mail->addAddress('laurie.rodriguez@sccmail.org');
                             $mail->Body    = "
 <p style='font-size:16px;'>
