@@ -28,7 +28,7 @@ class NewUserDB{
         /**
      * Adds a new SCC user to the database.
      *
-     * @param NewUser $user User object containing all required fields
+     * @param NewUser $user User object containing all required fields    
      * @return int|null Returns the inserted user ID, or null on failure
      */
     
@@ -68,7 +68,48 @@ class NewUserDB{
            error_log("Database error: " . $e->getMessage());
             return null;
         }
+
     }
+        /**
+     * Adds a new SCC user groups and xdrive folders to the database.
+     *
+     * @param array $groups Array of email groups
+     * @param array $xFolders Array of xdrive folders
+     * @param int $userId The user ID to associate with the groups and folders
+     * @return bool Returns true on success, false on failure
+     */
+    public function addGroupsXFolders($groups, $xFolders, $userId){
+
+		try {
+            foreach($groups as $group) {
+			$stmt = $this->pdo->prepare("
+				INSERT INTO groups_folders (user_id, email)VALUES(?, ?)"
+			);
+
+			$stmt->execute([
+				$userId,
+				$group,
+			]);
+            }
+            foreach($xFolders as $folder) {
+			$stmt = $this->pdo->prepare("
+				INSERT INTO groups_folders (user_id, xdrive)VALUES(?, ?)"
+			);
+
+			$stmt->execute([
+				$userId,
+				$folder,
+			]);
+            
+            }
+            return true;
+		} catch (PDOException $e) {
+			error_log("Database error: " . $e->getMessage());
+			return null;
+		}        
+	
+
+	}
     
         /**
      * Updates an existing SCC user by ID.
@@ -128,6 +169,42 @@ class NewUserDB{
         }
     }
 
+    public function updateGroupsXFolders($groups, $xFolders, $userId){
+
+		try {
+            $stmt = $this->pdo->prepare("DELETE FROM groups_folders WHERE user_id = ?");
+            $stmt->execute([$userId]);
+
+            foreach($groups as $group) {
+			$stmt = $this->pdo->prepare("
+				INSERT INTO groups_folders (user_id, email)VALUES(?, ?)"
+			);
+
+			$stmt->execute([
+				$userId,
+				$group,
+			]);
+            }
+            foreach($xFolders as $folder) {
+			$stmt = $this->pdo->prepare("
+				INSERT INTO groups_folders (user_id, xdrive)VALUES(?, ?)"
+			);
+
+			$stmt->execute([
+				$userId,
+				$folder,
+			]);
+            
+            }
+            return true;
+		} catch (PDOException $e) {
+			error_log("Database error: " . $e->getMessage());
+			return null;
+		}        
+	
+
+	}
+
 
     /**
      * Deletes a user by ID.
@@ -153,9 +230,23 @@ class NewUserDB{
 
     public function getAllNewUsers(): ?array 
 	{
-		$stmt = $this->pdo->prepare("SELECT * FROM scc_user ORDER BY id DESC;");
-		$stmt->execute();
-		return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+		$stmt = $this->pdo->prepare("SELECT u.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM scc_user u LEFT JOIN groups_folders g ON u.id = g.user_id GROUP BY u.id ORDER BY u.id DESC;");
+		$stmt->execute([]);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+            if ($rows) {
+                foreach ($rows as &$row) {
+                    // Convert comma-separated strings to arrays
+                    $row['emailGroups'] = $row['emailGroups']
+                        ? explode(',', $row['emailGroups'])
+                        : [];
+
+                    $row['xDriveFolders'] = $row['xDriveFolders']
+                        ? explode(',', $row['xDriveFolders'])
+                        : [];
+                }
+            }
+
+            return $rows;
 	}
 
         /**
@@ -167,9 +258,23 @@ class NewUserDB{
 
     public function getAllNewUsersByDept(string $dept): ?array
 	{
-		$stmt = $this->pdo->prepare("SELECT * FROM scc_user WHERE dept = ? ORDER BY id DESC;");
+		$stmt = $this->pdo->prepare("SELECT u.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM scc_user u LEFT JOIN groups_folders g ON u.id = g.user_id WHERE u.dept = ? GROUP BY u.id ORDER BY u.id DESC;");
 		$stmt->execute([$dept]);
-		return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+            if ($rows) {
+                foreach ($rows as &$row) {
+                    // Convert comma-separated strings to arrays
+                    $row['emailGroups'] = $row['emailGroups']
+                        ? explode(',', $row['emailGroups'])
+                        : [];
+
+                    $row['xDriveFolders'] = $row['xDriveFolders']
+                        ? explode(',', $row['xDriveFolders'])
+                        : [];
+                }
+            }
+
+            return $rows;
 	}
 
 

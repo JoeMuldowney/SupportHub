@@ -56,9 +56,14 @@ class Router
 			(new TaskController)->updateStatus();
         } elseif ($uri === '/solution/add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 			(new TaskController)->addSolution();
-        } elseif ($uri === '/admin') {
-
+        } elseif ($uri === '/ticket/history' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+			(new TaskController)->showTaskHistory();
+        } elseif ($uri === '/scc/history' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            (new TaskController)->showUserTaskHistory();  
+        }
+        
         // Admin routes
+        elseif ($uri === '/admin') {        
 			(new AdminController)->admin();  
         } else if ($uri === '/edituser/submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             (new AdminController)->updateUserInfo();

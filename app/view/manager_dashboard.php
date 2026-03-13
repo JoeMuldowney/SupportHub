@@ -10,7 +10,28 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 </head>
-
+<!--
+    Client-side live search filter.
+    Filters visible user rows based on text typed into #search input.
+    Performs case-insensitive substring match against row text.
+-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  // Attach keyup event to search box to dynamically filter users
+$(document).ready(function () {
+    $("#search").on("keyup", function () {
+        var searchTerm = $(this).val().toLowerCase();
+        $(".dept-users").each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(searchTerm) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+});
+</script>
 
 <body class="bg-light p-4">
 
@@ -100,8 +121,9 @@
         </thead>
 
         <tbody>
+
           <?php foreach ($users as $user): ?>
-            <tr>
+            <tr class="dept-users">
               <td><?= htmlspecialchars($user['fname']) ?> <?= htmlspecialchars($user['lname']) ?></td>
               <td><?= htmlspecialchars($user['title']) ?></td>
               <td><?= htmlspecialchars($user['dept']) ?></td>
@@ -171,7 +193,7 @@
 <!-- Modal: Create a New Employee -->
 <!-- Submits to controller route: add_new_user-->
 <div class="modal fade" id="addUserModal" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="add_new_user_ticket_and_send_email" action="add_new_user" method="POST">
       <div class="modal-header">
         
@@ -181,6 +203,7 @@
       <div class="modal-body">
         <!-- first page of modal -->
         <div id="step1-add" class="step-add">
+          <legend>Employee Information</legend>
         <div class="mb-3">
           <label for="fname" class="form-label">First name</label>
           <input type="text" name="fname" class="form-control" id="fname-add" required>          
@@ -235,7 +258,7 @@
 
        <!-- second page of modal -->
        <div id="step2-add" class="step-add" style="display: none;">
-       <legend>Position Classification</legend>
+       <legend>Work Classification</legend>
           <div class="mb-3">  
             <label>Exempt (salary)</label>
                 <input type="radio" id="workTypeSalary-add" name="workType-add" value="salary">
@@ -265,11 +288,8 @@
                     <label>Please specify how many weekly hours: </label>
                         <input type="text" id="hours-add" placeholder='00.0' name="hours">
           </div>
-          </div>
-
-          <!-- third page of modal -->
-          <div id="step3-add" class="step-add" style="display: none;">
-          <legend>Check all that apply</legend>
+          
+          <legend>Applications</legend>
 
           <div class="mb-3"> 
             <label>Avaya Cloud Office</label>
@@ -293,9 +313,48 @@
                 <input type="checkbox" id="shadowagent" name="shadowagent" value="shadowagent">
              
             </div>
+            </div>
+              <div id="step3-add" class="step-add" style="display: none;">
+              <legend>Email Groups</legend>
+
+              <div id="emailGroupsContainer-add">
+                <div class="mb-3 email-group-field">
+                  
+                  <input type="text" name="emailGroups[]" class="form-control" placeholder="Enter email group">
+                </div>
+              </div>
+
+              <button type="button" id="addEmailGroup-add" class="btn btn-sm btn-info">
+                + Add Another Group
+              </button>
+              <legend class="mt-3">X Drive Folders</legend>
+                <div id="xDriveFoldersContainer-add">
+                <div class="mb-3 x-drive-folder-field">
+                  
+                  <input type="text" name="xDriveFolders[]" class="form-control" placeholder="Enter X drive folder name">
+                </div>
+              </div>
+
+              <button type="button" id="addXDriveFolder-add" class="btn btn-sm btn-info">
+                + Add Another Folder
+              </button>
+
+              <legend class="mt-3">Additional Information</legend>
+
+              <div id="commentsContainer-add">
+                <div class="mb-3 comment-field">
+                  
+                  <textarea type="text" name="comment" class="form-control" rows="3" placeholder="Enter additional information here"></textarea>
+                </div>
+              </div> 
+            </div>
  
-          </div>
-      </div>
+
+            
+    </div>
+ 
+          
+
    
     
 
@@ -312,12 +371,13 @@
 <!-- Modal: Edit An Employee -->
 <!-- Submits to controller route: update_new_user-->
 <div class="modal fade" id="editUserModal" tabindex="-1" >
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="updateSccUser" action="update_new_user"  method="POST">       
       <div class="modal-body">
        
         <!-- first page of modal -->
         <div id="step1-update" class="step-update">
+          <legend>Employee Information</legend>
           <input type="hidden" id="id-update" name="id-update">
           <div class="mb-3">
             <label for="fname" class="form-label">First name</label>
@@ -373,62 +433,90 @@
         </div>
             <!-- second page of edit modal -->
           <div id="step2-update" class="step-update" style="display: none;">
-            <div class="mb-3">  
-              <label>Exempt (salary)</label>
-              <input type="radio" id="workTypeSalary-update" name="workType-update" value="salary">
-            </div>
-            <div class="mb-3">
-              <label>Full-Time (hourly)</label>
-              <input type="radio" id = "workTypeFull-update" name="workType-update" value="Full-time">
-            </div>
-            <div class="mb-3"> 
-              <label>Temporary (full-time)</label>
-              <input type="radio" id="workTypeTemp-update" name="workType-update" value="temp">
-            </div>
-            <div class="mb-3"> 
-              <label>Non-exempt (Hourly) Temporary</label>
-              <input type="radio" id="workTypeTempHourly-update" name="workType-update" value="hourly">
-            </div>
-            <div class="mb-3"> 
-              <label>Part-Time</label>
-              <input type="radio" id = "workTypePart-update" name="workType-update" value="Part-time">
-            </div>
-            <div class="mb-3" id="hoursDiv-update">
-              <label>Please specify how many weekly hours: </label>
-              <input type="text" id="hours-update" placeholder='00.0' name="hours-update">
-            </div>
-          </div>
-
-          <!-- Third page of edit modal -->
-            <div id="step3-update" class="step-update" style="display: none;">
-              <legend>Check all that apply</legend>
-
-
-              <div class="mb-3"> 
-                <label>Avaya Cloud Office</label>
-                <input type="checkbox" id="avaya-update" name="avaya-update" value="avaya">
+            <legend>Work Classification</legend>
+              <div class="mb-3">  
+                <label>Exempt (salary)</label>
+                <input type="radio" id="workTypeSalary-update" name="workType-update" value="salary">
+              </div>
+              <div class="mb-3">
+                <label>Full-Time (hourly)</label>
+                <input type="radio" id = "workTypeFull-update" name="workType-update" value="Full-time">
               </div>
               <div class="mb-3"> 
-                <label>eCIRTS</label>
-                <input type="checkbox" id="ecirts-update" name="ecirts-update" value="ecirts">
+                <label>Temporary (full-time)</label>
+                <input type="radio" id="workTypeTemp-update" name="workType-update" value="temp">
               </div>
               <div class="mb-3"> 
-                <label>DOTS</label>
-                <input type="checkbox" id="dots-update" name="dots-update" value="dots">
+                <label>Non-exempt (Hourly) Temporary</label>
+                <input type="radio" id="workTypeTempHourly-update" name="workType-update" value="hourly">
               </div>
-
-              <div class="mb-3">        
-                <label>Shadow Agent</label>
-                <input type="checkbox" id="shadow_agent-update" name="shadowagent-update" value="shadowagent">
+              <div class="mb-3"> 
+                <label>Part-Time</label>
+                <input type="radio" id = "workTypePart-update" name="workType-update" value="Part-time">
               </div>
+              <div class="mb-3" id="hoursDiv-update">
+                <label>Please specify how many weekly hours: </label>
+                <input type="text" id="hours-update" placeholder='00.0' name="hours-update">
+              </div> 
+              <legend>Applications</legend>
+                <div class="mb-3"> 
+                  <label>Avaya Cloud Office</label>
+                  <input type="checkbox" id="avaya-update" name="avaya-update" value="avaya">
+                </div>
+                <div class="mb-3"> 
+                  <label>eCIRTS</label>
+                  <input type="checkbox" id="ecirts-update" name="ecirts-update" value="ecirts">
+                </div>
+                <div class="mb-3"> 
+                  <label>DOTS</label>
+                  <input type="checkbox" id="dots-update" name="dots-update" value="dots">
+                </div>
+                <div class="mb-3">        
+                  <label>Shadow Agent</label>
+                  <input type="checkbox" id="shadow_agent-update" name="shadowagent-update" value="shadowagent">
+                </div>
  
             </div>
-        </div>     
+            <div id="step3-update" class="step-update" style="display: none;">
+              <legend>Email Groups</legend>
+
+              <div id="emailGroupsContainer-update">
+                <div class="mb-3 email-group-field">
+                  <label>Email Group</label>
+                  <input type="text" name="emailGroups[]" class="form-control" placeholder="Enter email group">
+                </div>
+              </div>
+
+                <button type="button" id="addEmailGroup-update" class="btn btn-sm btn-primary">
+                  + Add Another Group
+                </button>
+              <legend class="mt-3">X Drive Folders</legend>
+              <div id="xDriveFoldersContainer-update">
+                <div class="mb-3 x-drive-folder-field">
+                  <label>X Drive Folder</label>
+                  <input type="text" name="xDriveFolders[]" class="form-control" placeholder="Enter X drive folder name">
+                </div>
+              </div>
+
+                <button type="button" id="addXDriveFolder-update" class="btn btn-sm btn-info">
+                  + Add Another Folder
+                </button>
+
+              <legend class="mt-3">Additional Information</legend>
+              <div id="commentsContainer-update">
+                <div class="mb-3 comment-field">                  
+                  <textarea type="text" name="comment-update" class="form-control" rows="3" placeholder="Enter additional information here"></textarea>
+                </div>
+                </div>
+            </div>
+            
+          </div>
+                
     
 
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" id="backBtn-update" style="display: none;">Back</button>
-  <button type="button" class="btn btn-primary" id="nextBtn-update">Next</button>
+  <button type="button" class="btn btn-primary" id="nextBtn-update">Next</button>    
   <button type="submit" class="btn btn-success" id="submitBtn-update">Submit</button>
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 </div>
@@ -439,7 +527,7 @@
 <!-- Modal: Delete An Employee -->
 <!-- Submits to controller route: delete_user -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" >
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="deleteSccUser" action="delete_user"  method="POST">       
       <div class="modal-body">
         <input type="hidden" name="deleteid" id="deleteId">
@@ -476,7 +564,7 @@
 <!-- Submits to controller route: delete_user -->
  <!-- Removes new user from database (useful for no shows)-->
 <div class="modal fade" id="adminDeleteUserModal" tabindex="-1" >
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="adminDeleteSccUser" action="admin_delete_user"  method="POST">       
       <div class="modal-body">
         <input type="hidden" name="adminDeleteId" id="adminDeleteId">
@@ -505,64 +593,65 @@
 <!-- Modal: Viewe An Employee -->
 <!-- No submits -->
 <div class="modal fade" id="viewUserModal" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <form class="modal-content" id="view_new_user_ticket">
       <div class="modal-header">
-        
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       
       <div class="modal-body">
+        <div id="noComments">
         <!-- first page of view modal -->
         <div id="step1-view" class="step-view">
+          <legend>Employee Information</legend>
           <input type="hidden" id="id-view" name="id-view">
-          <div class="mb-3">
-            <label for="fname" class="form-label">First name</label>
-            <input type="text" name="fname" class="form-control" id="fname-view">          
-          </div>
-          <div class="mb-3">
-            <label for="lanme" class="form-label">Last name</label>
-            <input type="text" name="lname" class="form-control" id="lname-view">          
-          </div>
-          <div class="mb-3">
-            <label for="pname" class="form-label">Preferred first name</label>
-            <input type="text" name="pname" class="form-control" id="pname-view">          
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="text" name="email" class="form-control" id="email-view">          
-          </div>
-          <div class="mb-3">
-            <label for="dept" class="form-label">Department</label>
-            <input type="text" name="dept" class="form-control" id="dept-view">          
-          </div>
-          <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="title" class="form-control" id="title-view">          
-          </div>
-          <div class="mb-3">
-            <label>Supervisor's Full Name</label>
-            <input type="text" name="supervisor" class="form-control" id="supervisor-view">
-          </div>
-          <div class="mb-3">
-            <label for="location">Office Cubicle</label>
-            <input type="text" id="location-view" name="location" class="form-control"> 
-          </div>
-          <div class="mb-3">
-            <label>Stare date</label>
-            <input type="text" name="sdate" class="form-control" id="sdate-view" placeholder="yyyy-mm-dd">
-          </div>
+            <div class="mb-3">
+              <label for="fname" class="form-label">First name</label>
+              <input type="text" name="fname" class="form-control" id="fname-view">          
+            </div>
+            <div class="mb-3">
+              <label for="lname" class="form-label">Last name</label>
+              <input type="text" name="lname" class="form-control" id="lname-view">          
+            </div>
+            <div class="mb-3">
+              <label for="pname" class="form-label">Preferred first name</label>
+              <input type="text" name="pname" class="form-control" id="pname-view">          
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="text" name="email" class="form-control" id="email-view">          
+            </div>
+            <div class="mb-3">
+              <label for="dept" class="form-label">Department</label>
+              <input type="text" name="dept" class="form-control" id="dept-view">          
+            </div>
+            <div class="mb-3">
+              <label for="title" class="form-label">Title</label>
+              <input type="text" name="title" class="form-control" id="title-view">          
+            </div>
+            <div class="mb-3">
+              <label>Supervisor's Full Name</label>
+              <input type="text" name="supervisor" class="form-control" id="supervisor-view">
+            </div>
+            <div class="mb-3">
+              <label for="location">Office Cubicle</label>
+              <input type="text" id="location-view" name="location" class="form-control"> 
+            </div>
+            <div class="mb-3">
+              <label>Start date</label>
+              <input type="text" name="sdate" class="form-control" id="sdate-view" placeholder="yyyy-mm-dd">
+            </div>
         </div>
-       <!-- second page of view modal -->
-       <div id="step2-view" class="step-view" style="display: none;">
-        <legend>Position Classification</legend>
+        <!-- second page of view modal -->
+        <div id="step2-view" class="step-view" style="display: none;">
+        <legend>Work Classification</legend>
           <div class="mb-3">  
             <label>Exempt (salary)</label>
             <input type="radio" id="workTypeSalary-view" name="workType-view" value="salary">
           </div>
           <div class="mb-3">
             <label>Full-Time (hourly)</label>
-              <input type="radio" id = "workTypeFull-view" name="workType-view" value="Full-time">
+            <input type="radio" id = "workTypeFull-view" name="workType-view" value="Full-time">
           </div>
           <div class="mb-3"> 
             <label>Temporary (full-time)</label>
@@ -580,40 +669,62 @@
             <label>Please specify how many weekly hours: </label>
             <input type="text" id="hours-view" placeholder='00.0' name="hours">
           </div>
-        </div>
-          <!-- third page of view modal -->
-          <div id="step3-view" class="step-view" style="display: none;">
-              <legend>Check all that apply</legend>
-
-  
-
-              <div class="mb-3"> 
-                <label>Avaya Cloud Office</label>
-                <input type="checkbox" id="avaya-view" name="avaya-view" value="avaya">
+          <legend>Applications</legend>  
+          <div class="mb-3"> 
+            <label>Avaya Cloud Office</label>
+            <input type="checkbox" id="avaya-view" name="avaya-view" value="avaya">
+          </div>
+          <div class="mb-3"> 
+            <label>eCIRTS</label>
+            <input type="checkbox" id="ecirts-view" name="ecirts-view" value="ecirts">
+          </div>
+          <div class="mb-3"> 
+            <label>DOTS</label>
+            <input type="checkbox" id="dots-view" name="dots-view" value="dots">
+          </div> 
+          <div class="mb-3">        
+            <label>Shadow Agent</label>
+            <input type="checkbox" id="shadow_agent-view" name="shadowagent-view" value="shadowagent">
+          </div> 
+          </div>
+            <div id="step3-view" class="step-view" style="display: none;">
+            <legend>Email Groups</legend>
+          <div id="emailGroupsContainer-view">
+            <div class="mb-3 email-group-field">
+              <label>Email Group</label>
+              <input type="text" name="emailGroups[]" class="form-control" placeholder="Enter email group">
               </div>
-              <div class="mb-3"> 
-                <label>eCIRTS</label>
-                <input type="checkbox" id="ecirts-view" name="ecirts-view" value="ecirts">
-              </div>
-              <div class="mb-3"> 
-                <label>DOTS</label>
-                <input type="checkbox" id="dots-view" name="dots-view" value="dots">
-              </div>
- 
-              <div class="mb-3">        
-                <label>Shadow Agent</label>
-                <input type="checkbox" id="shadow_agent-view" name="shadowagent-view" value="shadowagent">
-              </div>
- 
+          </div>
+            <legend class="mt-3">X Drive Folders</legend>
+          <div id="xDriveFoldersContainer-view">
+            <div class="mb-3 x-drive-folder-field">
+              <label>X Drive Folder</label>
+              <input type="text" name="xDriveFolders[]" class="form-control" placeholder="Enter X drive folder name">
             </div>
-    </div>
+          </div>
+        </div>
+        </div>
+            <!--  HISTORY -->
+          <div id="historyComments" style="display:none;">
+          <h5 class="mb-3">Ticket History</h5>
+            <div id="historyContainer" class="border rounded p-3" style="max-height:400px; overflow-y:auto;">
+              Loading history...
+            </div>
+          </div>      
+      
+      
+  </div>
  
    
     
 
 <div class="modal-footer">
+  
   <button type="button" class="btn btn-secondary" id="backBtn-view" style="display: none;">Back</button>
   <button type="button" class="btn btn-primary" id="nextBtn-view">Next</button>
+  <button type="button" id="viewHistoryBtn" onclick="historyView()" class="btn btn-info">View Notes</button>
+  <button type="button" id="backButton" onclick="prevStep()" class="btn btn-secondary" style="display:none;">Back</button>
+ 
   <button type="submit" class="btn btn-success" id="submitBtn-view">Submit</button>  
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 </div>
@@ -804,10 +915,238 @@ function populateModal(user, modal, postfix) {
         const checkbox = modal.querySelector(`#${field}-${postfix}`);
         if (checkbox) checkbox.checked = Boolean(user[field]);
     });
+
+// ===== Populate Email Groups =====
+const emailContainer = modal.querySelector(`#emailGroupsContainer-${postfix}`);
+if (emailContainer) {
+    emailContainer.innerHTML = '';
+
+    if (Array.isArray(user.emailGroups) && user.emailGroups.length > 0) {
+        user.emailGroups.forEach(group => {
+            const div = document.createElement('div');
+            div.classList.add('mb-3', 'email-group-field');
+
+            div.innerHTML = `
+                <div class="d-flex mt-2">
+                    <input type="text"
+                           name="emailGroups[]"
+                           class="form-control me-2"
+                           value="${group}"
+                           ${postfix === 'view' ? 'readonly' : ''}>
+                    ${postfix !== 'view' ? '<button type="button" class="btn btn-danger btn-sm remove-field">X</button>' : ''}
+                </div>
+            `;
+
+            emailContainer.appendChild(div);
+        });
+    } else if (postfix !== 'view') {
+        emailContainer.innerHTML = `
+            <div class="mb-3 email-group-field">
+                <input type="text"
+                       name="emailGroups[]"
+                       class="form-control"
+                       placeholder="Enter email group">
+            </div>`;
+    }
 }
 
-  
-  
+// ===== Populate X Drive =====
+const xDriveContainer = modal.querySelector(`#xDriveFoldersContainer-${postfix}`);
+if (xDriveContainer) {
+    xDriveContainer.innerHTML = '';
+
+    if (Array.isArray(user.xDriveFolders) && user.xDriveFolders.length > 0) {
+        user.xDriveFolders.forEach(folder => {
+            const div = document.createElement('div');
+            div.classList.add('mb-3', 'x-drive-folder-field');
+
+            div.innerHTML = `
+                <div class="d-flex mt-2">
+                    <input type="text"
+                           name="xDriveFolders[]"
+                           class="form-control me-2"
+                           value="${folder}"
+                           ${postfix === 'view' ? 'readonly' : ''}>
+                    ${postfix !== 'view' ? '<button type="button" class="btn btn-danger btn-sm remove-xfield">X</button>' : ''}
+                </div>
+            `;
+
+            xDriveContainer.appendChild(div);
+        });
+    } else if (postfix !== 'view') {
+        xDriveContainer.innerHTML = `
+            <div class="mb-3 x-drive-folder-field">
+                <input type="text"
+                       name="xDriveFolders[]"
+                       class="form-control"
+                       placeholder="Enter X drive folder name">
+            </div>`;
+    }
+}
+
+}
+// =============================
+// ADD MODAL DYNAMIC GROUPS
+// =============================
+document.getElementById('addEmailGroup-add')?.addEventListener('click', function () {
+    const container = document.getElementById('emailGroupsContainer-add');
+
+    const div = document.createElement('div');
+    div.classList.add('mb-3', 'email-group-field');
+    div.innerHTML = `
+      <div class="d-flex mt-2">
+        <input type="text" name="emailGroups[]" class="form-control me-2" placeholder="Enter email group">
+        <button type="button" class="btn btn-danger btn-sm remove-field">X</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+});
+
+// =============================
+// UPDATE MODAL DYNAMIC GROUPS
+// =============================
+document.getElementById('addEmailGroup-update')?.addEventListener('click', function () {
+    const container = document.getElementById('emailGroupsContainer-update');
+
+    const div = document.createElement('div');
+    div.classList.add('mb-3', 'email-group-field');
+    div.innerHTML = `
+      <div class="d-flex mt-2">
+        <input type="text" name="emailGroups[]" class="form-control me-2" placeholder="Enter email group">
+        <button type="button" class="btn btn-danger btn-sm remove-field">X</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+});
+
+// =============================
+// ADD MODAL X DRIVE
+// =============================
+document.getElementById('addXDriveFolder-add')?.addEventListener('click', function () {
+    const container = document.getElementById('xDriveFoldersContainer-add');
+
+    const div = document.createElement('div');
+    div.classList.add('mb-3', 'x-drive-folder-field');
+    div.innerHTML = `
+      <div class="d-flex mt-2">
+        <input type="text" name="xDriveFolders[]" class="form-control me-2" placeholder="Enter X drive folder name">
+        <button type="button" class="btn btn-danger btn-sm remove-xfield">X</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+});
+
+// =============================
+// UPDATE MODAL X DRIVE
+// =============================
+document.getElementById('addXDriveFolder-update')?.addEventListener('click', function () {
+    const container = document.getElementById('xDriveFoldersContainer-update');
+
+    const div = document.createElement('div');
+    div.classList.add('mb-3', 'x-drive-folder-field');
+    div.innerHTML = `
+      <div class="d-flex mt-2">
+        <input type="text" name="xDriveFolders[]" class="form-control me-2" placeholder="Enter X drive folder name">
+        <button type="button" class="btn btn-danger btn-sm remove-xfield">X</button>
+      </div>
+    `;
+
+    container.appendChild(div);
+});
+
+
+
+// =============================
+// GLOBAL REMOVE HANDLER (WORKS FOR ALL)
+// =============================
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-field')) {
+        e.target.closest('.email-group-field')?.remove();
+    }
+
+    if (e.target.classList.contains('remove-xfield')) {
+        e.target.closest('.x-drive-folder-field')?.remove();
+    }
+});
+function historyView() {
+
+   
+    document.getElementById("historyComments").style.display = "inline-block";
+    document.getElementById("noComments").style.display = "none";
+
+    document.getElementById("backButton").style.display = "inline-block";
+
+   
+
+    // Hide these buttons
+    document.getElementById("viewHistoryBtn").style.display = "none";
+    document.getElementById("backBtn-view").style.display = "none";
+    document.getElementById("nextBtn-view").style.display = "none";
+
+    let sccUserId = document.getElementById("id-view").value;
+
+    fetch("scc/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "sccUserId=" + encodeURIComponent(sccUserId)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        let container = document.getElementById("historyContainer");
+        container.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            container.innerHTML = "<p>No history found.</p>";
+            return;
+        }
+
+        data.forEach(row => {
+
+            container.innerHTML += `
+                <div class="border-bottom mb-2 pb-2">
+                    <strong>${row.commented_by ?? 'Unknown'}</strong>
+                    <span class="text-muted"> - ${row.timestamp ?? ''}</span>
+                    <div>${row.comment ?? ''}</div>
+                </div>
+            `;
+
+        });
+
+    });
+
+}
+function prevStep(){
+
+    document.getElementById("historyComments").style.display = "none";
+    document.getElementById("noComments").style.display = "block";
+
+    document.getElementById("backButton").style.display = "none";
+
+        // Show buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+    document.getElementById("backBtn-view").style.display = "inline-block";
+    document.getElementById("nextBtn-view").style.display = "inline-block";
+
+}
+document.getElementById('viewUserModal').addEventListener('hidden.bs.modal', function () {
+
+    // Reset steps
+    document.getElementById("noComments").style.display = "block";
+    document.getElementById("historyComments").style.display = "none";
+
+    // Hide back button
+    document.getElementById("backButton").style.display = "none";
+
+    // Show action buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+    document.getElementById("backBtn-view").style.display = "inline-block";
+    document.getElementById("nextBtn-view").style.display = "inline-block";
+
+});
 
 </script>
 </body>

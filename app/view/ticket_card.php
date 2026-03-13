@@ -29,7 +29,7 @@
      data-images="<?= htmlspecialchars($ticket_images) ?>"
      data-solution="<?= htmlspecialchars($task['solution'] ?? '') ?>"
 >
-  <div><strong><?= htmlspecialchars($task['location'] ?? '') ?></strong></div>
+  
   <div><?= htmlspecialchars($task['priority'] ?? '') ?></div>
   <div><?= htmlspecialchars($task['user_desc'] ?? '') ?></div>
 </div>
