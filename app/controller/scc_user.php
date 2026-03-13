@@ -57,6 +57,7 @@ class NewUserController{
     $hours = (float)$_POST['hours'];
     $emailGroups = $_POST['emailGroups'] ?? [];
     $xDriveFolders = $_POST['xDriveFolders'] ?? [];
+    $moreInfo = $_POST['comment'] ?? '';
 
     $position = $_POST['workType-add'];
     if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
@@ -122,7 +123,7 @@ class NewUserController{
             
             $task = new task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
             $taskdb = new TaskDB();            
-            $new_ticket = $taskdb->addTask($task, $sccUserId);
+            $new_ticket = $taskdb->addTask($task, $sccUserId, $moreInfo);
 
             header("Location: /dashboard");
             exit;
@@ -171,6 +172,7 @@ class NewUserController{
         $position = $_POST['workType-update'];
         $hours = (float)$_POST['hours-update'];
         $sdate = $_POST['sdate-update'];
+        $moreInfo = $_POST['comment-update'] ?? '';
         $emailGroups = $_POST['emailGroups'] ?? [];
         $xDriveFolders = $_POST['xDriveFolders'] ?? [];
 
@@ -236,7 +238,7 @@ class NewUserController{
             
             $task = new Task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
             $taskdb = new TaskDB();            
-            $new_ticket = $taskdb->addTask($task);
+            $new_ticket = $taskdb->addTask($task, $id, $moreInfo);
 
             $_SESSION['result'] = "Updated Successfully.";
             header("Location: /userPanel");

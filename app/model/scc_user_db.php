@@ -28,7 +28,7 @@ class NewUserDB{
         /**
      * Adds a new SCC user to the database.
      *
-     * @param NewUser $user User object containing all required fields
+     * @param NewUser $user User object containing all required fields    
      * @return int|null Returns the inserted user ID, or null on failure
      */
     
@@ -68,6 +68,7 @@ class NewUserDB{
            error_log("Database error: " . $e->getMessage());
             return null;
         }
+
     }
         /**
      * Adds a new SCC user groups and xdrive folders to the database.

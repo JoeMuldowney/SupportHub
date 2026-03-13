@@ -234,7 +234,7 @@ class TaskController
         
         if($status === 'completed'){                    
 			
-            (new TaskDB())->addTaskSolution($id, $solution, $status);
+            (new TaskDB())->addTaskSolution($id, $solution, $status, $userEmail);
             
             header("Location: /dashboard");
             exit;
@@ -278,6 +278,16 @@ class TaskController
         $id = $_POST['ticketNum'];
  
         $comments = (new TaskDB())->getTaskCommentHistory($id);
+        
+        header('Content-Type: application/json');
+        echo json_encode($comments);
+        exit;
+    }
+
+    public function showUserTaskHistory(): array {
+        $id = $_POST['sccUserId'];
+ 
+        $comments = (new TaskDB())->getUserCommentHistory($id);
         
         header('Content-Type: application/json');
         echo json_encode($comments);

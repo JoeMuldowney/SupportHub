@@ -110,9 +110,12 @@ class TaskDB
      *
      * @param Task $task Task object
      * @return int|null Returns task ID on success, null on failure
+     * @param int|null $sccUserId Optional SCC user ID for tracking new user tasks
+      * @param string|null $moreInfo Optional additional info for comment history for new users
      */
 
-    public function addTask($task, $sccUserId = null): ?int{
+
+    public function addTask($task, $sccUserId = null, $moreInfo = null): ?int{
 
 		try {
 
@@ -133,13 +136,45 @@ class TaskDB
                 $task->getManagerEmail(),
                               
 			]);
+            } catch (PDOException $e) {
+                error_log("Database error: " . $e->getMessage());
+                return null;
+            }
+
             $ticketId = $this->pdo->lastInsertId();
+            if ($moreInfo === '') {
+                $moreInfo = null; // Set to null if empty string
+            }
+
+            if ($moreInfo && $ticketId && $sccUserId) {
+                try {
+                    $stmt = $this->pdo->prepare('INSERT INTO comment_history (ticket_id, scc_id, commented_by, comment) VALUES (?, ?, ?, ?)');
+                    $stmt->execute([$ticketId, $sccUserId, $task->getOpenedBy(), $moreInfo]);
+
+                    $stmt = $this->pdo->prepare("
+                        UPDATE task 
+                        SET solution = :comment
+                        WHERE id = :id
+                    ");
+
+                    $success = $stmt->execute([
+                        ':comment' => $moreInfo,
+                        ':id'       => $ticketId
+                    ]);
+
+
+                } catch (PDOException $e) {
+                    error_log("Database error: " . $e->getMessage());
+                }
+            }
             
             if ($ticketId) {
-                $email_counter = 0;
-                $solution = '';
+                try{
 
-                $stmt = $this->pdo->prepare("
+                    $email_counter = 0;
+                    $solution = '';
+
+                      $stmt = $this->pdo->prepare("
                     INSERT INTO email (user_email, supervisor_email, location, status, priority, user_desc, category, solution, email_counter, ticket_num, user_id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
@@ -158,17 +193,17 @@ class TaskDB
                     $ticketId, // Pass the ticket ID to the email table
                     $sccUserId // Pass the SCC user ID to the email table                    
                 ]);             
-            }
 
-		    return $ticketId;            
 
-		} catch (PDOException $e) {
-			error_log("Database error: " . $e->getMessage());
-			return null;
-		}        
-	
+                } catch (PDOException $e) {
+                    error_log("Database error: " . $e->getMessage());
+                    return null;
+                } 
+            } 
 
-	}
+		return $ticketId;   
+
+    }
 
     /**
      * Save images associated with a task.
@@ -313,9 +348,21 @@ class TaskDB
      * @return bool True on success
      */
 
-    public function addTaskSolution($id, $solution, $status): bool {
+    public function addTaskSolution($id, $solution, $status, $userEmail): bool {
     
     try {
+
+        $stmt = $this->pdo->prepare("
+            INSERT INTO comment_history(ticket_id, commented_by, comment)
+            VALUES (:ticket_id, :commented_by, :comment)
+        ");
+
+        $stmt->execute([
+            ':ticket_id' => $id,
+            ':commented_by' => $userEmail,
+            ':comment' => $solution
+        ]);
+
         $stmt = $this->pdo->prepare("
             UPDATE task 
             SET solution = :solution
@@ -361,9 +408,9 @@ class TaskDB
      * @param int $id Task ID
      * @param string $solution Comment or solution text
      * @param string $userEmail Email of commenter
-     * @return void
+     * @return bool True on success
      */
-    public function addTaskComment($id, $solution, $userEmail) {
+    public function addTaskComment($id, $solution, $userEmail): bool {
     
     try {
 
@@ -396,6 +443,7 @@ class TaskDB
         error_log("Database Error: " . $e->getMessage());
         exit;
     }
+        return $success;
     }
     /**
      * Retrieves comment history for a task.
@@ -414,6 +462,34 @@ class TaskDB
         ");
 
         $stmt->execute([':ticket_id' => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        
+   
+
+    } catch (PDOException $e) {
+        // Catch any connection or query-level errors
+        error_log("Database Error: " . $e->getMessage());
+        return []; // don't exit, just return empty array on error
+    }
+    }
+
+        /**
+     * Retrieves comment history for a task.
+     *
+     * @param int $id Task ID
+     * @return array List of user comment history records
+     */
+    public function getUserCommentHistory($id): array {    
+    
+    try {
+        $stmt = $this->pdo->prepare("
+            SELECT commented_by, comment, timestamp
+            FROM comment_history 
+            WHERE scc_id = :id
+            ORDER BY timestamp DESC
+        ");
+
+        $stmt->execute([':id' => $id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         
    

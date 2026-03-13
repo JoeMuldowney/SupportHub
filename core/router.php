@@ -58,7 +58,9 @@ class Router
 			(new TaskController)->addSolution();
         } elseif ($uri === '/ticket/history' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 			(new TaskController)->showTaskHistory();
-        } 
+        } elseif ($uri === '/scc/history' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            (new TaskController)->showUserTaskHistory();  
+        }
         
         // Admin routes
         elseif ($uri === '/admin') {        

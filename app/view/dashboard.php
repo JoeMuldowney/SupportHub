@@ -197,10 +197,10 @@ Modal: View Ticket Details
             <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
             <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
             <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
-            <p><strong>Comment:</strong> <span id="solutionProgress"></span></p>
+            <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
 
             <div class="mt-4">
-              <label for="solution" class="form-label">Add Comment</label>
+              <label for="solution" class="form-label">Add Note</label>
               <textarea id="solution" name="solution" class="form-control" rows="5"></textarea>
             </div>
 
