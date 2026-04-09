@@ -1,69 +1,76 @@
 # SupportHub
+
 A robust IT ticket management system designed to streamline daily operations and team communication.
-Allows employees to submit IT requests, while providing managers and admins with powerful tools to track, update, and automate workflow via a Kanban-style interface.
 
+## 📌 Overview
+SupportHub allows employees to submit IT requests, while providing managers and admins with powerful tools to track, update, and automate workflow via a Kanban-style interface.
 
-## Table of Contents
-- [Features](#features)
-- [Technologies Used](#technologies)
+## 🚀 Features
 
-# **Features**
+* **Kanban Workflow:** Track tickets through `New`, `In Progress`, and `Completed` stages with AJAX-powered drag-and-drop.
+* **Smart Automation:** 
+    * **Google Calendar API:** Automatic reminder creation for deadlines.
+    * **Cron Jobs:** A dedicated Docker container polls the DB to trigger real-time email notifications.
+* **Multi-Level Access Control:** 
+    * **Manager Portal:** Real-time team oversight and user management.
+    * **Admin Portal:** RBAC (Role-Based Access Control) and system-wide security settings.
+* **Advanced Search:** Live and filtered searching by department, status, or manager.
+* **Persistent Sessions:** Server-side session management for secure state persistence and flash messaging.
 
-1. **RESTful API**
-    - Manage ticket and user data with full CRUD operations (Create, Read, Update, Delete).    
+## 🛠 Tech Stack
 
-2. **Google Calendar Integration**
-    - Seamlessly integrates with the Google Calendar API.
-    - Automatically creates reminders for operational deadlines.    
+### Backend & Frontend
+- **Languages:** PHP, JavaScript (ES6+), HTML5, CSS3
+- **Libraries:** jQuery (AJAX interactions)
+- **Architecture:** MVC (Model-View-Controller)
 
-3. **User Interface**
-    - Kanban board for tracking ticket status: new, inprogress, and completed tickets.
-    - Drag-and-drop functionality using AJAX.
-    - Real-time UI updates for better organization and workflow.
+### Infrastructure & Tools
+- **Containerization:** Docker, Docker Compose
+- **APIs:** Google Calendar API, RESTful CRUD
+- **Version Control:** Git
 
-4. **Manager Portal**
-    - Elevated dashboard access for managers.
-    - View team tickets in real time.
-    - Request user updates and create new users.
+## 📦 Installation & Setup
 
-5. **Admin Portal**
-    - Role-Based Access Control (RBAC) management.
-    - Password reset functionality.
-    - System-wide visibility and administrative controls
+1. **Clone the repository:**
+   
+   git clone [https://github.com/JoeMuldowney/SupportHub.git](https://github.com/JoeMuldowney/SupportHub.git)
 
-6. **Cron Task Automation**
-    - Background script running in a separate Docker container.
-    - Polls ticket database for updates.
-    - Sends email notifications when: new tickets are created or completed.
+2. **Environment Configuration**
 
-7. **Session Management**
-    - Utilizes server-side sessions to maintain seamless user interactions across the application.
-    - Persists state after navigation to improve user experience.
-    - Stores and displays validation errors and success messages across requests.
+- Create a folder named "secrets" in the root directory and configure the following:
 
-8. **Search**
-    - Provides filtered search by department, manager, and ticket status.
-    - Implements live search functionality for tickets and users.
+# Database
+DB_HOST=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+DB_ROOT_PASSWORD=
 
-      
-# **Technologies**
+# Email
+MAIL_HOST=
+MAIL_PORT=
 
-1. Languages
-    - PHP
-    - JavaScript
-    - HTML
-    - CSS
+# Google Calendar API
+- Requires an account on Google developer and configuration of api and services from console.
+calendar.json
 
-2.  Libraries & Frameworks
-    - jQuery
+3. **Create Temp User**
+- For intial access update line 155 in db.sql with a temp password hash to login with as a admin user.
 
-3. Concepts & Techniques
-    - RESTful APIs
-    - AJAX
-    - MVC
+4. **Start Apllication**
+- Run "docker-compose up --build" in project root.
 
-4.  Tools & Infrastructure
-    - Docker
-    - Docker Compose
-    - Git
+## 📸 Visual Overview
 
+<p align="center">
+  <img src="assets/SupportHub2.png" width="800" alt="SupportHub Kanban Board Demo">
+  <br>
+  <em>Interactive Kanban board featuring drag-and-drop ticket management.</em>
+</p>
+
+---
+
+### Dashboards
+<p align="center">
+    <img src="assets/SupportHub1.png" width="45%" alt="Admin Portal View">
+</p>
