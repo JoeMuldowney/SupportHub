@@ -140,7 +140,7 @@ class Email {
 
             if($category === 'New Hire'){
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $mail->Subject = "Support Hub New Hire Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
@@ -167,7 +167,7 @@ class Email {
 </p>
 
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
@@ -179,7 +179,7 @@ Senior Connection Center
 
             }
             else if($category === 'Update SCC User'){
-                //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->Subject = "Support Hub Update SCC User Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
@@ -211,7 +211,7 @@ We've received your update SCC user support ticket and are working on it.
             
 
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
@@ -223,7 +223,7 @@ Senior Connection Center
 
             }
             else if($category === 'Termination'){
-                //$mail->addAddress('laurie.rodriguez@sccmail.org');
+                $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->Subject = "Support Hub Termination Ticket Received - Ticket #$ticket_number";
                 $mail->Body    = "
@@ -245,7 +245,7 @@ We've received your termination support ticket and are working on it.
 
             
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
@@ -276,7 +276,7 @@ We've received your support ticket and are working on it.
 </p>
         
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
@@ -372,7 +372,7 @@ We've received your update SCC user support ticket and are working on it.
             
 
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
@@ -406,7 +406,7 @@ We've resolved your support ticket.
 </p>
 
 <p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6a/dashboard
+You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
 </p>
 <p style='font-size:16px;'>
 Thank you for using Support Hub.
