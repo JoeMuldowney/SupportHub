@@ -33,26 +33,22 @@ SupportHub allows employees to submit IT requests, while providing managers and 
 
 1. **Clone the repository:**
    
-   git clone [https://github.com/JoeMuldowney/SupportHub.git](https://github.com/JoeMuldowney/SupportHub.git)
+    - git clone [https://github.com/JoeMuldowney/SupportHub.git](https://github.com/JoeMuldowney/SupportHub.git)
 
 2. **Environment Configuration**
 
 - Create a folder named "secrets" in the root directory and configure the following:
 
-# Database
-DB_HOST=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
-DB_ROOT_PASSWORD=
+    - DB_HOST=
+    - DB_NAME=
+    - DB_USER=
+    - DB_PASSWORD=
+    - DB_ROOT_PASSWORD=
+    - MAIL_HOST=
+    - MAIL_PORT=
 
-# Email
-MAIL_HOST=
-MAIL_PORT=
-
-# Google Calendar API
-- Requires an account on Google developer and configuration of api and services from console.
-calendar.json
+    - Requires an account on Google developer and configuration of api and services from console to add the secret below.
+    - calendar.json
 
 3. **Create Temp User**
 - For intial access update line 155 in db.sql with a temp password hash to login with as a admin user.
@@ -69,8 +65,3 @@ calendar.json
 </p>
 
 ---
-
-### Dashboards
-<p align="center">
-    <img src="assets/SupportHub1.png" width="45%" alt="Admin Portal View">
-</p>
