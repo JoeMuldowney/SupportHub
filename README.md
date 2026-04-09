@@ -47,7 +47,7 @@ SupportHub allows employees to submit IT requests, while providing managers and 
     - MAIL_HOST=
     - MAIL_PORT=
 
-    - Requires an account on Google developer and configuration of api and services from console to add the secret below.
+- Requires an account on Google developer and configuration of api and services from console to add the secret below.
     - calendar.json
 
 3. **Create Temp User**
