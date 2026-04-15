@@ -3,10 +3,17 @@ CREATE DATABASE IF NOT EXISTS ticket_system_db;
 
 USE ticket_system_db;
 
+DROP TABLE IF EXISTS image;
+DROP TABLE IF EXISTS comment_history;
+DROP TABLE IF EXISTS groups_folders;
+DROP TABLE IF EXISTS task;
+DROP TABLE IF EXISTS scc_user;
+DROP TABLE IF EXISTS email;
+DROP TABLE IF EXISTS users;
+
 -- =========================
 -- USERS TABLE
 -- =========================
-DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   user_id INT NOT NULL AUTO_INCREMENT,
@@ -24,7 +31,6 @@ CREATE TABLE users (
 -- =========================
 -- TASK TABLE
 -- =========================
-DROP TABLE IF EXISTS task;
 
 CREATE TABLE task (
   id INT NOT NULL AUTO_INCREMENT,
@@ -53,7 +59,7 @@ CREATE TABLE task (
 -- =========================
 -- IMAGE TABLE
 -- =========================
-DROP TABLE IF EXISTS image;
+
 
 CREATE TABLE image (
   id INT NOT NULL AUTO_INCREMENT,
@@ -70,7 +76,7 @@ CREATE TABLE image (
 -- =========================
 -- EMAIL TABLE
 -- =========================
-DROP TABLE IF EXISTS email;
+
 
 CREATE TABLE email (
   id INT NOT NULL AUTO_INCREMENT,
@@ -91,7 +97,7 @@ CREATE TABLE email (
 -- =========================
 -- SCC USER TABLE
 -- =========================
-DROP TABLE IF EXISTS scc_user;
+
 
 CREATE TABLE scc_user (
   id INT NOT NULL AUTO_INCREMENT,
@@ -116,7 +122,7 @@ CREATE TABLE scc_user (
 -- =========================
 -- SCC USER Groups & Folders TABLE
 -- =========================
-DROP TABLE IF EXISTS groups_folders;
+
 
 CREATE TABLE groups_folders (
   id INT NOT NULL AUTO_INCREMENT,
@@ -134,7 +140,7 @@ CREATE TABLE groups_folders (
 -- =========================
 -- Ticket Comment History TABLE
 -- =========================
-DROP TABLE IF EXISTS comment_history;
+
 
 CREATE TABLE comment_history (
   id INT NOT NULL AUTO_INCREMENT,
