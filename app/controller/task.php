@@ -105,7 +105,13 @@ class TaskController
         $priority = trim($_POST['priority']);
         $status = 'new';
         $user_desc = ($_POST['desc']);
-        $category = trim($_POST['taskName']);           
+
+        $category = trim($_POST['taskName']); 
+        if (empty($location) || empty($priority) || empty($user_desc) || empty($category)) {
+            $_SESSION['error'] = "Please fill in all required fields.";
+            header("Location: /dashboard");
+            exit;
+        }          
         $date_opened= (new DateTime())->format("Y-m-d");        
         $user_id = $_SESSION['user_id'];
         $user_email = $_SESSION['email'];
@@ -164,7 +170,7 @@ class TaskController
                 header("Location: /dashboard");
                 exit;
             } else {         
-                $_SESSION['result'] = "Failed to add ticket";
+                $_SESSION['error'] = "Failed to add ticket";
                 header("Location: /dashboard");
                 exit;
             }

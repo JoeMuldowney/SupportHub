@@ -1,45 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Register</title>
-  <!-- Bootstrap 5 CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
- <style>
-    /* Background Gradient */
-    body {
-      background: linear-gradient(135deg, #6f42c1, #fd7e14);
-      font-family: 'Arial', sans-serif;
-    }
-    /* Custom Card Styling */
-    .login-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    /* Button Hover Effects */
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-    /* Form Field with Icons */
-    .input-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 5px;
-      color: #aaa;
-    }
-    .form-control {
-      padding-left: 30px;
-    }
-    .input-group-text {
-      background-color: transparent;
-      border: none;
-    }
+<?php include __DIR__ . '/head.php'; ?>
 
-  </style>
 <?php include 'header.php'; ?>
 <body class="bg-light d-flex justify-content-center align-items-center vh-100">
   <div class="card shadow p-4" style="max-width: 450px; width: 100%;">

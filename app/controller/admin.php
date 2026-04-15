@@ -115,7 +115,7 @@ class AdminController{
             $userReset = (new UserDB)->changePass($email, $hashedPassword);
 
             if (!empty($userReset)) {
-                $_SESSION['error'] = 'Password updated.';
+                $_SESSION['result'] = 'Password updated.';
                 header("Location: /admin");
                 exit;
             }
@@ -159,7 +159,7 @@ class AdminController{
 
         if ($userRow) {  
 
-
+            $_SESSION['result'] = "User information updated successfully.";
             header("Location: /admin");
             exit;
         }
@@ -197,7 +197,7 @@ class AdminController{
         $deletedTicketUser = (new UserDB )->deleteUserByEmail($email);
         $deletedSccUser = (new NewUserDB )->deleteUserById($getSccUserId);
         if($deletedTicketUser && $deletedSccUser ){
-            $_SESSION['error'] = 'Successfully Deleted User';
+            $_SESSION['result'] = 'Successfully Deleted User';
             header("Location: /admin");
             exit;
         }else{

@@ -95,6 +95,7 @@ class AuthController
             // success            
             $_SESSION['user_id'] = $userRow['user_id'];
             $_SESSION['fname'] = $userRow['first_name'];
+            $_SESSION['name'] = $userRow['first_name'] . ' ' . $userRow['last_name'];
             $_SESSION['email'] = $userRow['email'];
             $_SESSION['dept'] = $userRow['dept'];
             $_SESSION['manager_email'] = $userRow['manager'];
@@ -217,8 +218,10 @@ class AuthController
             $_SESSION['user_id'] = $userInfo['user_id'];
             $_SESSION['fname'] = $userInfo['first_name'];
             $_SESSION['lname'] = $userInfo['last_name'];
+            $_SESSION['name'] = $userInfo['first_name'] . ' ' . $userInfo['last_name'];
             $_SESSION['email'] = $userInfo['email'];
             $_SESSION['role'] = $userInfo['role']; //capture user's role for admin priviledges
+            $_SESSION['result'] = 'Registration successful.';
             header("Location: /dashboard");
             exit;
 

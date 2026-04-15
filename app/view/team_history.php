@@ -1,66 +1,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Team History</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<style>
-  .task-row {
-  cursor: pointer;
-}
-.task-row:hover {
-  background-color: #f8f9fa;
-}
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-$(document).ready(function () {
-    var toggleOn = $("#toggleButton").data("toggled") === true;
-
-    // Function to toggle all tickets or onlu open and in progress tickets.  Open/inprogress only by default
-    function toggleElements() {
-        if (toggleOn) {
-            $("#toggleButton").text("All Tickets");
-            $(".all-task-row:contains('completed')").hide();
-        } else {
-            $("#toggleButton").text("Open Tickets");
-            $(".all-task-row").show();
-        }
-    }
-
-    // Call the function initially to set the initial state
-    toggleElements();
-
-    // Add a click event handler to the button
-    $("#toggleButton").click(function () {
-        toggleOn = !toggleOn; // Toggle the state
-        toggleElements(); // Call the function to toggle elements
-    });
-});
-
-/*
-    Client-side live search filter.
-    Filters visible user rows based on text typed into #search input.
-    Performs case-insensitive substring match against row text.
-*/
-$(document).ready(function () {
-    $("#search").on("keyup", function () {
-        var searchTerm = $(this).val().toLowerCase();
-        $(".all-task-row").each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(searchTerm) === -1) {
-                $(this).hide();
-            } else {
-                $(this).show();
-            }
-        });
-    });
-});
-</script>
-
+<?php include __DIR__ . '/head.php'; ?>
 
 <body class="bg-light p-4">
 
@@ -232,7 +173,7 @@ Modal: View Ticket Details
           integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
           crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
   /* Pass in values for each ticket inlisted in the row using data * attributes */
   document.addEventListener('DOMContentLoaded', function () {
@@ -283,6 +224,51 @@ Modal: View Ticket Details
       });
     });
   });
+
+
+$(document).ready(function () {
+    var toggleOn = $("#toggleButton").data("toggled") === true;
+
+    // Function to toggle all tickets or onlu open and in progress tickets.  Open/inprogress only by default
+    function toggleElements() {
+        if (toggleOn) {
+            $("#toggleButton").text("All Tickets");
+            $(".all-task-row:contains('completed')").hide();
+        } else {
+            $("#toggleButton").text("Open Tickets");
+            $(".all-task-row").show();
+        }
+    }
+
+    // Call the function initially to set the initial state
+    toggleElements();
+
+    // Add a click event handler to the button
+    $("#toggleButton").click(function () {
+        toggleOn = !toggleOn; // Toggle the state
+        toggleElements(); // Call the function to toggle elements
+    });
+});
+
+
+   // Client-side live search filter.
+   // Filters visible user rows based on text typed into #search input.
+   // Performs case-insensitive substring match against row text.
+
+$(document).ready(function () {
+    $("#search").on("keyup", function () {
+        var searchTerm = $(this).val().toLowerCase();
+        $(".all-task-row").each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(searchTerm) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+});
+
 </script>
 
 

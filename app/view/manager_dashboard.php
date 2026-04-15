@@ -1,37 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Manager Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<?php include __DIR__ . '/head.php'; ?>
 
-  <!-- script to allow j query to be used -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-</head>
-<!--
-    Client-side live search filter.
-    Filters visible user rows based on text typed into #search input.
-    Performs case-insensitive substring match against row text.
--->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-  // Attach keyup event to search box to dynamically filter users
-$(document).ready(function () {
-    $("#search").on("keyup", function () {
-        var searchTerm = $(this).val().toLowerCase();
-        $(".dept-users").each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(searchTerm) === -1) {
-                $(this).hide();
-            } else {
-                $(this).show();
-            }
-        });
-    });
-});
-</script>
 
 <body class="bg-light p-4">
 
@@ -205,11 +175,11 @@ $(document).ready(function () {
         <div id="step1-add" class="step-add">
           <legend>Employee Information</legend>
         <div class="mb-3">
-          <label for="fname" class="form-label">First name</label>
+          <label for="fname" class="form-label">First name*</label>
           <input type="text" name="fname" class="form-control" id="fname-add" required>          
         </div>
           <div class="mb-3">
-          <label for="lanme" class="form-label">Last name</label>
+          <label for="lname" class="form-label">Last name*</label>
           <input type="text" name="lname" class="form-control" id="lname-add" required>          
         </div>
         <div class="mb-3">
@@ -217,11 +187,11 @@ $(document).ready(function () {
           <input type="text" name="pname" class="form-control" id="pname-add">          
         </div>
           <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="text" name="email" class="form-control" id="email-add" required>          
+          <label for="email" class="form-label">Email*</label>
+          <input type="text" name="email" class="form-control" placeholder="firstname.lastname@sccmail.com" id="email-add" required>          
         </div>
         <div class="mb-3">
-          <label for="dept" class="form-label">Department</label>          
+          <label for="dept" class="form-label">Department*</label>          
             <select name="dept" id="dept-add" class="form-control">
               <option value="">--Please choose a department--</option>
                  <option value="ADRC">ADRC</option>
@@ -239,26 +209,26 @@ $(document).ready(function () {
             </select>         
         </div>
         <div class="mb-3">
-          <label for="title" class="form-label">Title</label>
+          <label for="title" class="form-label">Title*</label>
           <input type="text" name="title" class="form-control" id="title-add" required>          
         </div>
         <div class="mb-3">
-          <label>Supervisor's Full Name</label>
+          <label>Supervisor's Full Name*</label>
           <input type="text" name="supervisor" class="form-control" id="supervisor-add" required>
         </div>
         <div class="mb-3">
-          <label for="location">Office Cubicle</label>
+          <label for="location">Office Cubicle*</label>
           <input type="text" id="location" name="location" class="form-control"> <a href="http://sccintranet/apps/inventory/map/floorplan_view.odb" target="_blank">Click Here to View Floorplan</a>
         </div>
             <div class="mb-3">
-          <label>Stare date</label>
+          <label>Start date*</label>
           <input type="date" name="sdate" class="form-control" id="sdate-add" placeholder="yyyy-mm-dd" required>
         </div>
           </div>
 
        <!-- second page of modal -->
        <div id="step2-add" class="step-add" style="display: none;">
-       <legend>Work Classification</legend>
+       <legend>Work Classification*</legend>
           <div class="mb-3">  
             <label>Exempt (salary)</label>
                 <input type="radio" id="workTypeSalary-add" name="workType-add" value="salary">
@@ -734,6 +704,7 @@ $(document).ready(function () {
 <!-- Bootstrap JS (includes Popper) -->
   
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <!-- Add event listeners for each modal -->
 <!--create logic for multi-step modals
@@ -1146,6 +1117,26 @@ document.getElementById('viewUserModal').addEventListener('hidden.bs.modal', fun
     document.getElementById("backBtn-view").style.display = "inline-block";
     document.getElementById("nextBtn-view").style.display = "inline-block";
 
+});
+
+    //Client-side live search filter.
+    //Filters visible user rows based on text typed into #search input.
+    //Performs case-insensitive substring match against row text.
+
+
+  // Attach keyup event to search box to dynamically filter users
+$(document).ready(function () {
+    $("#search").on("keyup", function () {
+        var searchTerm = $(this).val().toLowerCase();
+        $(".dept-users").each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(searchTerm) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
 });
 
 </script>

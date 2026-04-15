@@ -1,38 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashbaord</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
-
-
-
-<!--
-    Client-side live search filter.
-    Filters visible user rows based on text typed into #search input.
-    Performs case-insensitive substring match against row text.
--->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-  // Attach keyup event to search box to dynamically filter users
-$(document).ready(function () {
-    $("#search").on("keyup", function () {
-        var searchTerm = $(this).val().toLowerCase();
-        $(".all-users").each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(searchTerm) === -1) {
-                $(this).hide();
-            } else {
-                $(this).show();
-            }
-        });
-    });
-});
-</script>
-
+<?php include __DIR__ . '/head.php'; ?>
 
 <body class="bg-light p-4">
 
@@ -77,6 +45,14 @@ $(document).ready(function () {
     echo "<div class='alert alert-danger'>$errors</div>";
   }
   unset($_SESSION['error']);
+?>
+
+<?php
+  $errors = $_SESSION['result'] ?? [];
+  if (!empty($errors)) {
+    echo "<div class='alert alert-success'>$errors</div>";
+  }
+  unset($_SESSION['result']);
 ?>
 
 <!--
@@ -313,7 +289,7 @@ $(document).ready(function () {
     with selected user information before modal opens.
 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 // Populate Change Password modal email field
 function populateEmail(email) {
@@ -326,6 +302,29 @@ function populateDelete(fname, lname, email) {
     document.querySelector('#getDeleteName').value = fname + " " + lname;
     document.querySelector('#getDeleteEmail').value = email;
 }	
+
+
+    //Client-side live search filter.
+    //Filters visible user rows based on text typed into #search input.
+    //Performs case-insensitive substring match against row text.
+
+
+
+  // Attach keyup event to search box to dynamically filter users
+$(document).ready(function () {
+    $("#search").on("keyup", function () {
+        var searchTerm = $(this).val().toLowerCase();
+        $(".all-users").each(function () {
+            var text = $(this).text().toLowerCase();
+            if (text.indexOf(searchTerm) === -1) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            }
+        });
+    });
+});
+
 </script>
 </body>
 </html>

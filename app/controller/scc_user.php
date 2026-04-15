@@ -53,8 +53,8 @@ class NewUserController{
     $dept = $_POST['dept'];
     $title = $_POST['title'];
     $supervisor = $_POST['supervisor'];
-    $location = (int)$_POST['location'];
-    $hours = (float)$_POST['hours'];
+    $location = $_POST['location'];
+    $hours = $_POST['hours'];
     $emailGroups = $_POST['emailGroups'] ?? [];
     $xDriveFolders = $_POST['xDriveFolders'] ?? [];
     $moreInfo = $_POST['comment'] ?? '';
@@ -63,7 +63,38 @@ class NewUserController{
     if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
         $hours = 37.5;
     }
-    $sdate = $_POST['sdate'];  
+    $sdate = $_POST['sdate']; 
+    if (empty($fname) || empty($lname) || empty($email) || empty($dept) || empty($title) || empty($supervisor) || empty($location) || empty($position) || empty($sdate)) {
+        $_SESSION['error'] = "Please fill in all required fields.";
+        header("Location: /userPanel");
+        exit;
+    } 
+
+     // EMAIL
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = "Error: Invalid email format. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
+        // LOCATION (integer)
+        $location = filter_input(INPUT_POST, 'location', FILTER_VALIDATE_INT);
+
+        if ($location === false) {
+            $_SESSION['error'] = "Error: Location must be a number. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
+        $hours = filter_input(INPUT_POST, 'hours', FILTER_VALIDATE_FLOAT);
+        if ($hours === false) {
+            $_SESSION['error'] = "Error: Hours must be a valid number. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
 
    
     
@@ -124,14 +155,14 @@ class NewUserController{
             $task = new task(NULL, $user_id, $location, $priority, $status, $user_desc, $date_opened, NULL, NULL, NULL, $user_email, NULL, NULL, $category, NULL, $manager);
             $taskdb = new TaskDB();            
             $new_ticket = $taskdb->addTask($task, $sccUserId, $moreInfo);
-
+            $_SESSION['result'] = "User created successfully.";
             header("Location: /dashboard");
             exit;
 
         }else{
       
         $_SESSION['error'] = 'Error creating user';
-        header("Location: /manager_dashboard.php");
+        header("Location: /userPanel");
         exit;
     }
 
@@ -168,7 +199,7 @@ class NewUserController{
         $dept = $_POST['dept-update'];
         $title = $_POST['title-update'];
         $supervisor = $_POST['supervisor-update'];
-        $location = (int)$_POST['location-update'];
+        $location = $_POST['location-update'];
         $position = $_POST['workType-update'];
         $hours = (float)$_POST['hours-update'];
         $sdate = $_POST['sdate-update'];
@@ -179,7 +210,37 @@ class NewUserController{
         if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
             $hours = 37.5;
         }
-        
+        if (empty($fname) || empty($lname) || empty($email) || empty($dept) || empty($title) || empty($supervisor) || empty($location) || empty($position) || empty($sdate)) {
+            $_SESSION['error'] = "Please fill in all required fields.";
+            header("Location: /userPanel");
+            exit;
+        }
+
+        // EMAIL
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = "Error: Invalid email format. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
+        // LOCATION (integer)
+        $location = filter_input(INPUT_POST, 'location-update', FILTER_VALIDATE_INT);
+
+        if ($location === false) {
+            $_SESSION['error'] = "Error: Location must be a number. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
+        $hours = filter_input(INPUT_POST, 'hours-update', FILTER_VALIDATE_FLOAT);
+        if ($hours === false) {
+            $_SESSION['error'] = "Error: Hours must be a valid number. Ticket not created.";
+            header("Location: /userPanel");
+            exit;
+        }
+
 
         $avaya = isset($_POST['avaya-update']) ? 'yes' : '';
         $ecirts = isset($_POST['ecirts-update']) ? 'yes' : '';
@@ -241,7 +302,7 @@ class NewUserController{
             $new_ticket = $taskdb->addTask($task, $id, $moreInfo);
 
             $_SESSION['result'] = "Updated Successfully.";
-            header("Location: /userPanel");
+            header("Location: /dashboard");
             exit;        
             }
 
@@ -309,13 +370,14 @@ class NewUserController{
         $_SESSION['result'] = "Updated Successfully.";        
         $_SESSION['user_name'] = $fname . " " . $lname;
         $_SESSION['user_termdate'] = $tDate;
-        $_SESSION['user_termtime'] = $tTime;  
+        $_SESSION['user_termtime'] = $tTime; 
+        $_SESSION['result'] = "Termination ticket created successfully."; 
         header("Location: /dashboard");
         exit;      
     }
 
         $_SESSION['error'] = 'Invalid user';
-        header("Location: /dashboard");
+        header("Location: /userPanel");
         exit;   
     }     
  

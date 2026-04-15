@@ -1,25 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <style>
-    body { background-color: #f8f9fa; padding: 2rem; }
-    .board { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
-    .column { background: white; border-radius: 8px; padding: 1rem; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; }
-    .column h2 { text-align: center; margin-bottom: 1rem; font-size: 1.5rem; color: #343a40; }
-    .card { margin-bottom: 1rem; border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease; cursor: pointer; white-space: normal; word-wrap: break-word; min-height: 48px; line-height: 1.4; }
-    .card:hover { transform: scale(1.02); }
-    .card.todo { background-color: #f8d7da; color: #721c24; }
-    .card.inprogress { background-color: #bee5eb; color: #0c5460; }
-    .card.done { background-color: #d4edda; color: #155724; }
-  </style>
-</head>
+<?php include __DIR__ . '/head.php'; ?>
 <body>
 
 <!--
@@ -56,6 +37,10 @@
   <?php unset($_SESSION['result']); ?>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['error'])): ?>
+  <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+  <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
 <!-- Kanban Board showing the progress of tickets in 3 columns. New, inprogress and completed.  Each ticket is clickable and opens the view ticket modal -->
 
 <?php if ($noTasks): ?>
@@ -100,7 +85,7 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label for="taskName" class="form-label">Issue</label>
+          <label for="taskName" class="form-label">Issue*</label>
           <select class="form-select" id="taskName" name="taskName" required>
             <option value="" disabled selected>Select an issue</option> 
             <option value="Account Access / Password Reset">Account Access / Password Reset</option>
@@ -121,7 +106,7 @@
 
         <!-- Location -->
         <div class="mb-3">
-          <label class="form-label d-block">Location</label>
+          <label class="form-label d-block">Location*</label>
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="location" id="location-home" value="Home" required>
             <label class="form-check-label" for="location-home">Home</label>
@@ -134,7 +119,7 @@
 
         <!-- Priority -->
         <div class="mb-3">
-          <label class="form-label d-block">Priority</label>
+          <label class="form-label d-block">Priority*</label>
           <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="priority" id="priority-high" value="High" required>
             <label class="form-check-label" for="priority-high">High</label>
@@ -150,7 +135,7 @@
         </div>
 
         <div class="mb-3">
-          <label for="desc" class="form-label">Description of the problem</label>
+          <label for="desc" class="form-label">Description of the problem*</label>
           <textarea id="desc" name="desc" class="form-control" rows="5"></textarea>
         </div>
         <!-- Image -->
