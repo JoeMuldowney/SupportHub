@@ -1,38 +1,133 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background: #f4f4f4;
-}
+ /* dashboard view styles */
+body { background-color: #f8f9fa; padding: 2rem; }
+.board { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+.column { background: white; border-radius: 8px; padding: 1rem; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; }
+.column h2 { text-align: center; margin-bottom: 1rem; font-size: 1.5rem; color: #343a40; }
+.card { margin-bottom: 1rem; border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease; cursor: pointer; white-space: normal; word-wrap: break-word; min-height: 48px; line-height: 1.4; }
+.card:hover { transform: scale(1.02); }
+.card.todo { background-color: #f8d7da; color: #721c24; }
+.card.inprogress { background-color: #bee5eb; color: #0c5460; }
+.card.done { background-color: #d4edda; color: #155724; }
 
-h1 {
-  text-align: center;
+/* history view styles */
+  .task-row {
+  cursor: pointer;
 }
-
-.board {
-  display: flex;
-  justify-content: space-around;
-  gap: 20px;
-  margin-top: 30px;
+.task-row:hover {
+  background-color: #f8f9fa;
 }
-
-.column {
-  background: #e0e0e0;
-  padding: 15px;
-  border-radius: 8px;
-  width: 30%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+ 
+/* home view styles */
+        body {
+            background: linear-gradient(135deg, #6f42c1, #fd7e14);
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .home-container {
+            text-align: center;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            color: #333; /* 👈 ADD THIS */
+            
+        }
+        .btn-enter {
+            background-color: #fff;
+            color: #007bff;
+            border: none;
+            font-weight: bold;
+            padding: 10px 20px;
+        }
+        .btn-enter:hover {
+            background-color: #e2e6ea;
+            color: #0056b3;
+        }
+a.white-link {
+    color: #6f42c1;
+    font-weight: bold;
 }
+        a.white-link:hover {
+            color: #ccc; /* hover effect */
+        }
+    .input-group-text {
+      background-color: transparent;
+      border: none;
+    }
 
-.column h2 {
-  text-align: center;
-  margin-top: 0;
+    
+/* login styles */
+    /* Background Gradient */
+    body {
+      background: linear-gradient(135deg, #6f42c1, #fd7e14);
+      font-family: 'Arial', sans-serif;
+    }
+    /* Custom Card Styling */
+    .login-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    /* Button Hover Effects */
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    /* Form Field with Icons */
+    .input-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 5px;
+      color: #aaa;
+    }
+    .form-control {
+      padding-left: 30px;
+    }
+    .input-group-text {
+      background-color: transparent;
+      border: none;
+    }
+/* registration styles */
+    /* Background Gradient */
+    body {
+      background: linear-gradient(135deg, #6f42c1, #fd7e14);
+      font-family: 'Arial', sans-serif;
+    }
+    /* Custom Card Styling */
+    .login-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    /* Button Hover Effects */
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    /* Form Field with Icons */
+    .input-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 5px;
+      color: #aaa;
+    }
+    .form-control {
+      padding-left: 30px;
+    }
+    .input-group-text {
+      background-color: transparent;
+      border: none;
+    }
+
+/* team history styles */
+  .task-row {
+  cursor: pointer;
 }
-
-.card {
-  background: white;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 6px;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+.task-row:hover {
+  background-color: #f8f9fa;
 }
