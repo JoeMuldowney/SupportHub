@@ -10,6 +10,7 @@ services:
     ports:
       - "80:80" # map host port 80 to container port 80
     volumes:
+      - .:
       # Persistent storage for uploaded ticket images
       - stored_images:/var/lib/tickets/data
        # Secret files for database credentials

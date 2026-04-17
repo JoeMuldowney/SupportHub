@@ -1,5 +1,11 @@
+     body {
+      background: linear-gradient(135deg, #6f42c1, #fd7e14);
+      font-family: 'Arial', sans-serif;
+    }
+ 
+ 
  /* dashboard view styles */
-body { background-color: #f8f9fa; padding: 2rem; }
+
 .board { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
 .column { background: white; border-radius: 8px; padding: 1rem; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; }
 .column h2 { text-align: center; margin-bottom: 1rem; font-size: 1.5rem; color: #343a40; }
@@ -10,6 +16,7 @@ body { background-color: #f8f9fa; padding: 2rem; }
 .card.done { background-color: #d4edda; color: #155724; }
 
 /* history view styles */
+/* team history styles */
   .task-row {
   cursor: pointer;
 }
@@ -18,16 +25,8 @@ body { background-color: #f8f9fa; padding: 2rem; }
 }
  
 /* home view styles */
-        body {
-            background: linear-gradient(135deg, #6f42c1, #fd7e14);
-            font-family: 'Arial', sans-serif;
-            height: 100vh;
-            
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-        .home-container {
+
+      .home-container {
             text-align: center;
             background: #fff;
             border-radius: 10px;
@@ -62,72 +61,30 @@ a.white-link {
 
     
 /* login styles */
-    /* Background Gradient */
-    body {
-      background: linear-gradient(135deg, #6f42c1, #fd7e14);
-      font-family: 'Arial', sans-serif;
-    }
-    /* Custom Card Styling */
-    .login-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    /* Button Hover Effects */
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-    /* Form Field with Icons */
-    .input-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 5px;
-      color: #aaa;
-    }
-    .form-control {
-      padding-left: 30px;
-    }
-    .input-group-text {
-      background-color: transparent;
-      border: none;
-    }
-/* registration styles */
-    /* Background Gradient */
-    body {
-      background: linear-gradient(135deg, #6f42c1, #fd7e14);
-      font-family: 'Arial', sans-serif;
-    }
-    /* Custom Card Styling */
-    .login-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    /* Button Hover Effects */
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-    /* Form Field with Icons */
-    .input-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 5px;
-      color: #aaa;
-    }
-    .form-control {
-      padding-left: 30px;
-    }
-    .input-group-text {
-      background-color: transparent;
-      border: none;
-    }
+/* registration styles */    
 
-/* team history styles */
-  .task-row {
-  cursor: pointer;
-}
-.task-row:hover {
-  background-color: #f8f9fa;
-}
+    /* Custom Card Styling */
+    .login-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    /* Button Hover Effects */
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+    /* Form Field with Icons */
+    .input-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 5px;
+      color: #aaa;
+    }
+    .form-control {
+      padding-left: 30px;
+    }
+    .input-group-text {
+      background-color: transparent;
+      border: none;
+    }

@@ -168,21 +168,29 @@ Modal: View Ticket Details
         <div class="modal-body">
           <!-- STEP 1 : Ticket Details -->
           <div id="step1">
-
+            <div class="container-fluid">
+           <div class="row">
+            <div class="col-6">
             <p><strong>Ticket:</strong> <span id="ticketNumber"></span></p>
             <p><strong>Category:</strong> <span id="viewCategory"></span></p>
             <p><strong>Location:</strong> <span id="viewLocation"></span></p>
             <p><strong>Priority:</strong> <span id="viewPriority"></span></p>
             <p><strong>Description:</strong> <span id="viewDesc"></span></p>
-            <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
             <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+            </div>
+            <div class="col-6">          
             <p><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
             <p><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
             <p><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
             <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
             <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
             <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
+            </div>
+    </div>
+    </div>
             <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
+            <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
 
             <div class="mt-4">
               <label for="solution" class="form-label">Add Note</label>
