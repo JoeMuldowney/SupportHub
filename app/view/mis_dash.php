@@ -315,13 +315,15 @@ $(document).ready(function () {
     $("#search").on("keyup", function () {
         var searchTerm = $(this).val().toLowerCase();
         $(".all-users").each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(searchTerm) === -1) {
-                $(this).hide();
-            } else {
-                $(this).show();
-            }
-        });
+        var name = $(this).find("td:eq(0)").text().toLowerCase();
+        var email = $(this).find("td:eq(1)").text().toLowerCase();
+
+        if ((name + " " + email).indexOf(searchTerm) === -1) {
+            $(this).hide();
+        } else {
+            $(this).show();
+        }
+                });
     });
 });
 

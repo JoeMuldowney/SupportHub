@@ -322,6 +322,8 @@ class TaskDB
 
     public function getAllTasksByStatus(string $status): array	{
 
+    if($status == 'new'){
+
 		$stmt = $this->pdo->prepare("SELECT t.*, i.name AS images FROM task t LEFT JOIN image i ON t.id = i.ticket_id WHERE t.status = ? ORDER BY Id DESC");
 		$stmt->execute([$status]);
 		                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -337,7 +339,46 @@ class TaskDB
             }
         }
         return array_values($tasks);
-	}
+	} 
+    elseif($status == 'inProgress') {
+           
+		$stmt = $this->pdo->prepare("SELECT t.*, i.name AS images FROM task t LEFT JOIN image i ON t.id = i.ticket_id WHERE t.status = ? ORDER BY date_updated DESC");
+		$stmt->execute([$status]);
+		                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tasks = [];
+        foreach ($rows as $row) {
+            $taskId = $row['id'];
+            if (!isset($tasks[$taskId])) {
+                $tasks[$taskId] = $row;
+                $tasks[$taskId]['images'] = [];
+            }
+            if ($row['images']) {
+                $tasks[$taskId]['images'][] = $row['images'];
+            }
+        }
+        return array_values($tasks);
+	} else {
+
+    	$stmt = $this->pdo->prepare("SELECT t.*, i.name AS images FROM task t LEFT JOIN image i ON t.id = i.ticket_id WHERE t.status = ? ORDER BY date_closed DESC");
+		$stmt->execute([$status]);
+		                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $tasks = [];
+        foreach ($rows as $row) {
+            $taskId = $row['id'];
+            if (!isset($tasks[$taskId])) {
+                $tasks[$taskId] = $row;
+                $tasks[$taskId]['images'] = [];
+            }
+            if ($row['images']) {
+                $tasks[$taskId]['images'][] = $row['images'];
+            }
+        }
+        return array_values($tasks);
+
+    }
+    }
+    
+
 
      /**
      * Add solution to a task and update email table.

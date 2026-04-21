@@ -284,7 +284,14 @@ class TaskController
         $id = $_POST['ticketNum'];
  
         $comments = (new TaskDB())->getTaskCommentHistory($id);
-        
+
+        foreach ($comments as &$comment) {
+            if (isset($comment['commented_by'])) {
+            $nameOpen = explode('@', $comment['commented_by'])[0];
+            $displayOpenName = str_replace('.', ' ', $nameOpen);
+            $comment['commented_by'] = $displayOpenName;
+    }
+}
         header('Content-Type: application/json');
         echo json_encode($comments);
         exit;

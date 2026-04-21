@@ -186,7 +186,7 @@ class AuthController
     {
         $username = trim($_POST['email'] ?? '');
         $fname = trim($_POST['fname'] ?? '');
-        $lname = trim($_POST['lname'] ?? '');
+        $lname = trim($_POST['lname'] ?? '');        
         $password = $_POST['password'] ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
         $role = 0;

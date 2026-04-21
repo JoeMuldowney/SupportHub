@@ -1,53 +1,57 @@
+     body {
+      background: #f5f6f8;
+      font-family: 'Arial', sans-serif;
+    }
+ 
+ 
  /* dashboard view styles */
-body { background-color: #f8f9fa; padding: 2rem; }
+
 .board { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
 .column { background: white; border-radius: 8px; padding: 1rem; flex: 1; min-width: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; }
 .column h2 { text-align: center; margin-bottom: 1rem; font-size: 1.5rem; color: #343a40; }
 .card { margin-bottom: 1rem; border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 500; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease; cursor: pointer; white-space: normal; word-wrap: break-word; min-height: 48px; line-height: 1.4; }
-.card:hover { transform: scale(1.02); }
+
 .card.todo { background-color: #f8d7da; color: #721c24; }
 .card.inprogress { background-color: #bee5eb; color: #0c5460; }
 .card.done { background-color: #d4edda; color: #155724; }
 
 /* history view styles */
+/* team history styles */
   .task-row {
   cursor: pointer;
 }
-.task-row:hover {
-  background-color: #f8f9fa;
-}
+
  
 /* home view styles */
-        body {
-            background: linear-gradient(135deg, #6f42c1, #fd7e14);
-            font-family: 'Arial', sans-serif;
-            height: 100vh;
-            
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-        .home-container {
-            text-align: center;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            color: #333; /* 👈 ADD THIS */
-            
-        }
-        .btn-enter {
-            background-color: #fff;
-            color: #007bff;
-            border: none;
-            font-weight: bold;
-            padding: 10px 20px;
-        }
-        .btn-enter:hover {
-            background-color: #e2e6ea;
-            color: #0056b3;
-        }
+
+.center-wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-container {
+  width: 600px;
+  height: 300px; /* square */
+
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+}
+.btn-enter {
+    background-color: #fff;
+    color: #007bff;
+    border: none;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+.btn-enter:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
 a.white-link {
     color: #6f42c1;
     font-weight: bold;
@@ -62,11 +66,8 @@ a.white-link {
 
     
 /* login styles */
-    /* Background Gradient */
-    body {
-      background: linear-gradient(135deg, #6f42c1, #fd7e14);
-      font-family: 'Arial', sans-serif;
-    }
+/* registration styles */    
+
     /* Custom Card Styling */
     .login-card {
       background: #fff;
@@ -84,50 +85,10 @@ a.white-link {
       left: 10px;
       padding: 5px;
       color: #aaa;
-    }
-    .form-control {
-      padding-left: 30px;
-    }
-    .input-group-text {
-      background-color: transparent;
-      border: none;
-    }
-/* registration styles */
-    /* Background Gradient */
-    body {
-      background: linear-gradient(135deg, #6f42c1, #fd7e14);
-      font-family: 'Arial', sans-serif;
-    }
-    /* Custom Card Styling */
-    .login-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    /* Button Hover Effects */
-    .btn-primary:hover {
-      background-color: #0056b3;
-    }
-    /* Form Field with Icons */
-    .input-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      padding: 5px;
-      color: #aaa;
-    }
-    .form-control {
-      padding-left: 30px;
-    }
-    .input-group-text {
-      background-color: transparent;
-      border: none;
     }
 
-/* team history styles */
-  .task-row {
-  cursor: pointer;
-}
-.task-row:hover {
-  background-color: #f8f9fa;
-}
+    .input-group-text {
+      background-color: transparent;
+      border: none;
+    }
+    
