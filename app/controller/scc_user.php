@@ -225,14 +225,6 @@ class NewUserController{
             exit;
         }
 
-        $hours = filter_input(INPUT_POST, 'hours-update', FILTER_VALIDATE_FLOAT);
-        if ($hours === false) {
-            $_SESSION['error'] = "Error: Hours must be a valid number. Ticket not created.";
-            header("Location: /userPanel");
-            exit;
-        }
-
-
         $avaya = isset($_POST['avaya-update']) ? 'yes' : '';
         $ecirts = isset($_POST['ecirts-update']) ? 'yes' : '';
         $dots = isset($_POST['dots-update']) ? 'yes' : '';       
