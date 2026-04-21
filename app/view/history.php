@@ -136,33 +136,97 @@ Modal: View Ticket Details
 - Allows to view all ticket data
 -->
 <div class="modal fade" id="viewTaskModal" tabindex="-1" aria-labelledby="viewTaskModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">      
-        <div class="modal-header">
-          <h5 class="modal-title" id="viewTaskModalLabel">Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewTaskModalLabel">Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      
+      <div class="modal-body">
+         <div id="step1">
+
+        <div class="row g-3">
+
+          <div class="col-6">
+            <div class="card h-90">
+              <div class="card-body">
+                <h6 class="text-muted">Details</h6>
+
+                <strong>Ticket Number:</strong> <span id="ticketNumber"></span>
+
+                <p class="mb-1"><strong>Category:</strong> <span id="viewCategory"></span></p>
+                <p class="mb-1"><strong>Location:</strong> <span id="viewLocation"></span></p>
+                <p class="mb-1"><strong>Priority:</strong> <span id="viewPriority"></span></p>
+                <p class="mb-1"><strong>Status:</strong> <span id="viewStatus"></span></p>
+                <p class="mb-1"><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6">
+            <div class="card h-90">
+              <div class="card-body">
+                <h6 class="text-muted">Tracking</h6>
+
+                <p class="mb-1"><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
+                <p class="mb-1"><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
+                <p class="mb-1"><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
+                <p class="mb-1"><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
+                <p class="mb-1"><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
+
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="modal-body">
-          <p><strong>Ticket:</strong> <span id="ticketNumber"></span></p>
-          <p><strong>Location:</strong> <span id="viewLocation"></span></p>
-          <p><strong>Priority:</strong> <span id="viewPriority"></span></p>
-          <p><strong>Description:</strong> <span id="viewDesc"></span></p>
-          <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
-          <p><strong>Status:</strong> <span id="viewStatus"></span></p>
-          <p><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
-          <p><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
-          <p><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
-          <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
-          <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
-          <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
-          <p><strong>Solution:</strong> <span id="solutionProgress"></span></p> 
+        <div class="card mt-3">
+          <div class="card-body">
+            <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
+            <p><strong>Description:</strong> <span id="viewDesc"></span></p>
+            <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
+          </div>
         </div>
 
-        <div class="modal-footer">
-          <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>          
-        </div>      
+      </div>
+    
+          <div id="step2" style="display:none;">
+
+<div class="card">
+  <div class="card-header bg-light">
+    <strong>History Timeline</strong>
+  </div>
+  <div id="historyContainer" class="card-body" style="max-height:400px; overflow-y:auto;">
+    Loading history...
+  </div>
+</div>
+        </div>
+      <!-- FOOTER -->
+      <div class="modal-footer d-flex justify-content-between">
+        <input type="hidden" id="ticketNumberValue">
+        <div>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+          <div>
+    <button type="button" id="backButton" onclick="prevStep()" class="btn btn-outline-secondary" style="display:none;">
+      Back
+    </button>
+
+    <button type="button" id="viewHistoryBtn" onclick="nextStep()" class="btn btn-info">
+      View History
+    </button>
+
+
+  </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -271,7 +335,103 @@ $(document).ready(function () {
         });
     });
 });
+/**
+ * Advances modal to step 2 (history view).
+ *
+ * Behavior:
+ * - Hides step 1 content
+ * - Shows step 2 history content
+ * - Displays back button
+ * - Hides action buttons
+ * - Fetches and renders ticket history
+ */
+function nextStep() {
 
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
+
+    document.getElementById("backButton").style.display = "inline-block";
+
+        // Hide these buttons
+    document.getElementById("viewHistoryBtn").style.display = "none";
+
+
+    let ticketNum = document.getElementById("ticketNumber").innerText;
+
+    fetch("ticket/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "ticketNum=" + encodeURIComponent(ticketNum)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        let container = document.getElementById("historyContainer");
+        container.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            container.innerHTML = "<p>No history found.</p>";
+            return;
+        }
+
+        data.forEach(row => {
+
+            container.innerHTML += `
+                <div class="border-bottom mb-2 pb-2">
+                    <strong>${row.commented_by ?? 'Unknown'}</strong>
+                    <span class="text-muted"> - ${row.timestamp ?? ''}</span>
+                    <div>${row.comment ?? ''}</div>
+                </div>
+            `;
+
+        });
+
+    });
+
+}
+/**
+ * Returns modal to step 1 (details view).
+ *
+ * Behavior:
+ * - Hides history step
+ * - Shows details step
+ * - Hides back button
+ * - Restores action buttons
+ */
+function prevStep(){
+
+    document.getElementById("step2").style.display = "none";
+    document.getElementById("step1").style.display = "block";
+
+    document.getElementById("backButton").style.display = "none";
+
+        // Show buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+}
+
+/**
+ * Resets modal to initial state when closed.
+ *
+ * Behavior:
+ * - Returns to step 1
+ * - Hides step 2
+ * - Hides back button
+ * - Restores action buttons
+ */
+document.getElementById('viewTaskModal').addEventListener('hidden.bs.modal', function () {
+
+    // Reset steps
+    document.getElementById("step1").style.display = "block";
+    document.getElementById("step2").style.display = "none";
+
+    // Hide back button
+    document.getElementById("backButton").style.display = "none";
+
+    // Show action buttons again
+    document.getElementById("viewHistoryBtn").style.display = "inline-block";
+
+
+});
 </script>
 </script>
 

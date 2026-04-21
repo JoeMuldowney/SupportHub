@@ -15,7 +15,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">MIS Support Hub Dashboard</a>
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center gap-2">
       <span class="navbar-text text-white me-3">
         Welcome <?= htmlspecialchars($_SESSION['fname'] ?? '') ?>!
       </span>
@@ -168,60 +168,103 @@ Modal: View Ticket Details
         <div class="modal-body">
           <!-- STEP 1 : Ticket Details -->
           <div id="step1">
-            <div class="container-fluid">
-           <div class="row">
-            <div class="col-6">
-            <p><strong>Ticket:</strong> <span id="ticketNumber"></span></p>
-            <p><strong>Category:</strong> <span id="viewCategory"></span></p>
-            <p><strong>Location:</strong> <span id="viewLocation"></span></p>
-            <p><strong>Priority:</strong> <span id="viewPriority"></span></p>
-            <p><strong>Description:</strong> <span id="viewDesc"></span></p>
-            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
-            <p><strong>Status:</strong> <span id="viewStatus"></span></p>
-            </div>
-            <div class="col-6">          
-            <p><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
-            <p><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
-            <p><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
-            <p><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
-            <p><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
-            <p><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
-            </div>
-    </div>
-    </div>
-            <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
-            <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
+            
 
-            <div class="mt-4">
-              <label for="solution" class="form-label">Add Note</label>
-              <textarea id="solution" name="solution" class="form-control" rows="5"></textarea>
-            </div>
 
-          </div>
+  <div class="row g-3">
+
+    <div class="col-6">
+      <div class="card h-90">
+        <div class="card-body">
+          <h6 class="text-muted">Details</h6>
+          <strong>Ticket Number:</strong> <span id="ticketNumber"></span>
+          <p class="mb-1"><strong>Category:</strong> <span id="viewCategory"></span></p>
+          <p class="mb-1"><strong>Location:</strong> <span id="viewLocation"></span></p>
+          <p class="mb-1"><strong>Priority:</strong> <span id="viewPriority"></span></p>
+          <p class="mb-1"><strong>Status:</strong> <span id="viewStatus"></span></p>
+          <p class="mb-1"><strong>Opened By:</strong> <span id="viewOpenedBy"></span></p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="card h-90">
+        <div class="card-body">
+          <h6 class="text-muted">Tracking</h6>
+
+          <p class="mb-1"><strong>Updated By:</strong> <span id="viewUpdatedBy"></span></p>
+          <p class="mb-1"><strong>Closed By:</strong> <span id="viewClosedBy"></span></p>
+          <p class="mb-1"><strong>Date Opened:</strong> <span id="viewDateOpened"></span></p>
+          <p class="mb-1"><strong>Date Updated:</strong> <span id="viewDateUpdated"></span></p>
+          <p class="mb-1"><strong>Date Closed:</strong> <span id="viewDateClosed"></span></p>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
+      <p><strong>Description:</strong> <span id="viewDesc"></span></p>
+      <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <label for="solution" class="form-label fw-bold">Add Note</label>
+    <textarea id="solution" name="solution" class="form-control" rows="5"></textarea>
+  </div>
+
+</div>
 
 
           <!-- STEP 2 : HISTORY -->
           <div id="step2" style="display:none;">
 
-            <h5 class="mb-3">Ticket History</h5>
-
-            <div id="historyContainer" class="border rounded p-3" style="max-height:400px; overflow-y:auto;">
-              Loading history...
-            </div>
-
-          </div>
+<div class="card">
+  <div class="card-header bg-light">
+    <strong>History Timeline</strong>
+  </div>
+  <div id="historyContainer" class="card-body" style="max-height:400px; overflow-y:auto;">
+    Loading history...
+  </div>
+</div>
         </div>
         
-        <div class="modal-footer">
+<div class="modal-footer d-flex justify-content-between">
           <input type="hidden" id="ticketNumberValue" name="ticketNum">
           <input type="hidden" id="ticketStatusValue" name="ticketStatus">
-          <button type="button" id="viewHistoryBtn" onclick="nextStep()" class="btn btn-info">View History</button>
-          <button type="button" id="backButton" onclick="prevStep()" class="btn btn-secondary" style="display:none;">Back</button>
-          <button type="button" id="reminderBtn" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addToCalender">Set Reminder</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" id="addBtn" class="btn btn-primary">Add</button>
-          
-        </div>
+<!-- Left side -->
+  <div>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      Close
+    </button>
+
+    <button type="button" id="reminderBtn" class="btn btn-success"
+      data-bs-toggle="modal" data-bs-target="#addToCalender">
+      Set Reminder
+    </button>
+  </div>
+
+  <!-- Right side -->
+  <div>
+    <button type="button" id="backButton" onclick="prevStep()" class="btn btn-outline-secondary" style="display:none;">
+      Back
+    </button>
+
+    <button type="button" id="viewHistoryBtn" onclick="nextStep()" class="btn btn-info">
+      View History
+    </button>
+
+    <button type="submit" id="addBtn" class="btn btn-primary">
+      Save Note
+    </button>
+  </div>
+
+</div>
       </form>
     </div>
   </div>

@@ -10,8 +10,7 @@
     if (!empty($errors)) echo "<p class='text-danger'>$errors</p>"; 
     unset($_SESSION['error']);
     ?>
-    <h3 class="text-center mb-3"></h3>
-    
+        
     <form action="login/submit" method="POST">
       <div class="mb-3 position-relative">
         <label for="email" class="form-label">Email</label>

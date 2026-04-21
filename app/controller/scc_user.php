@@ -61,8 +61,8 @@ class NewUserController{
 
     $position = $_POST['workType-add'];
     if($position == 'salary' || $position == 'Full-time' || $position == 'temp'){
-        $hours = 37.5;
-    }
+    $hours = 37.5;
+        }
     $sdate = $_POST['sdate']; 
     if (empty($fname) || empty($lname) || empty($email) || empty($dept) || empty($title) || empty($supervisor) || empty($location) || empty($position) || empty($sdate)) {
         $_SESSION['error'] = "Please fill in all required fields.";
@@ -87,15 +87,6 @@ class NewUserController{
             header("Location: /userPanel");
             exit;
         }
-
-        $hours = filter_input(INPUT_POST, 'hours', FILTER_VALIDATE_FLOAT);
-        if ($hours === false) {
-            $_SESSION['error'] = "Error: Hours must be a valid number. Ticket not created.";
-            header("Location: /userPanel");
-            exit;
-        }
-
-
    
     
    

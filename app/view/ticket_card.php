@@ -3,21 +3,29 @@
     $updatedBy  = $task['updated_by'] ?? '';
     $closedBy   = $task['closed_by'] ?? '';
     $dateOpened = $task['date_opened'] ?? '';
-    $dateUpdObj = $task['date_updated'] ?? '';
-    $dateClosed = $task['date_closed'] ?? '';
+    //$dateUpdObj = $task['date_updated'] ?? '';
+    //$dateClosed = $task['date_closed'] ?? '';
 
     $nameOpen = explode('@', $openedBy)[0];   // "firstname.lastname"
-    $displayOpenName = str_replace('.', ' ', $nameOpen);  // "firstname lastname"
+    $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));  // "firstname lastname"
 
     $nameUpdate = explode('@', $updatedBy)[0];   // "firstname.lastname"
-    $displayUpdateName = str_replace('.', ' ', $nameUpdate);  // "firstname lastname"
+    $displayUpdateName = ucwords(str_replace('.', ' ', $nameUpdate));  // "firstname lastname"
 
-    $nameClose = explode('@', $dateClosed)[0];   // "firstname.lastname"
-    $displayCloseName = str_replace('.', ' ', $nameClose);  // "firstname lastname"
+    $nameClose = explode('@', $closedBy )[0];   // "firstname.lastname"
+    $displayCloseName = ucwords(str_replace('.', ' ', $nameClose));  // "firstname lastname"
 
-    $dateUpdated = $dateUpdObj instanceof DateTime ? $dateUpdObj->format('Y-m-d') : '';
-    $dateClosedF = $dateClosed instanceof DateTime ? $dateClosed->format('Y-m-d') : '';
-    $ticket_images = implode(', ', $task['images'] ?? []);   
+    $dateOpenedObj = !empty($task['date_opened']) ? new DateTime($task['date_opened']) : null;
+    $dateOpened = $dateOpenedObj ? $dateOpenedObj->format('M d Y') : '';
+
+    $dateUpdObj = !empty($task['date_updated']) ? new DateTime($task['date_updated']) : null;
+    $dateClosedObj = !empty($task['date_closed']) ? new DateTime($task['date_closed']) : null;
+
+    $dateUpdated = $dateUpdObj ? $dateUpdObj->format('M d Y') : '';
+    $dateClosedF = $dateClosedObj ? $dateClosedObj->format('M d Y') : '';
+    
+    $ticket_images = implode(', ', $task['images'] ?? []);  
+
 
 
 ?>
@@ -38,8 +46,9 @@
      data-images="<?= htmlspecialchars($ticket_images) ?>"
      data-solution="<?= htmlspecialchars($task['solution'] ?? '') ?>"
 >
-  
+  <div><?= htmlspecialchars($task['id'] ?? '') ?></div>
+  <div><?= htmlspecialchars($task['location'] ?? '') ?></div>
   <div><?= htmlspecialchars($task['priority'] ?? '') ?></div>
-  <div><?= htmlspecialchars($task['user_desc'] ?? '') ?></div>
+  <div><?= htmlspecialchars($displayUpdateName ?? '') ?></div>
 </div>
 
