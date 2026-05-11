@@ -30,11 +30,18 @@ services:
     restart: unless-stopped
     container_name: supporthubemailservice
     volumes:
+      - stored_images:/var/lib/tickets/data # share uploaded ticket images with web container for backing up in cron job
+      # Persistent storage stored locally for backup files created by cron job
+      # will be mounted to /opt/backups in container and can be accessed on host at ./backups
+      # synced with google drive folder for offsite backup
+      - ./backups:/opt/backups
        # Secret files for database credentials
       - ./secrets/db_pass:/run/secrets/db_pass:ro
       - ./secrets/db_host:/run/secrets/db_host:ro
       - ./secrets/db_name:/run/secrets/db_name:ro
       - ./secrets/db_user:/run/secrets/db_user:ro
+      - ./secrets/db_root_pass:/run/secrets/db_root_pass:ro
+       # Secret files for email server credentials
       - ./secrets/mail_host:/run/secrets/mail_host:ro
       - ./secrets/mail_port:/run/secrets/mail_port:ro     
     depends_on:

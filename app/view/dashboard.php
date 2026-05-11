@@ -233,7 +233,7 @@ Modal: View Ticket Details
   </div>
 </div>
         </div>
-        
+    </div>
 <div class="modal-footer d-flex justify-content-between">
           <input type="hidden" id="ticketNumberValue" name="ticketNum">
           <input type="hidden" id="ticketStatusValue" name="ticketStatus">
