@@ -2,6 +2,7 @@ FROM php:8.2-cli
 
 # Install cron
 RUN apt-get update && apt-get install -y cron \
+    default-mysql-client \
     libzip-dev \
     && docker-php-ext-install pdo pdo_mysql zip \
     && apt-get clean \
@@ -14,6 +15,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Copy email script
 COPY cron_app/email.php cron_app/composer.json /app/
+
+# Copy backup script
+COPY cron_app/backup.sh /app/
+RUN chmod +x /app/backup.sh
 
 # Copy db connection
 COPY core/connection.php /app/

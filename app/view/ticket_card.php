@@ -48,7 +48,8 @@
 >
   <div><?= htmlspecialchars($task['id'] ?? '') ?></div>
   <div><?= htmlspecialchars($task['location'] ?? '') ?></div>
-  <div><?= htmlspecialchars($task['priority'] ?? '') ?></div>
-  <div><?= htmlspecialchars($displayUpdateName ?? '') ?></div>
+  <div><?= htmlspecialchars($task['category'] ?? '') ?></div>
+  <div><?= htmlspecialchars($displayOpenName ?? '') ?></div>
+
 </div>
 

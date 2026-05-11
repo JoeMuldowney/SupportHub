@@ -141,7 +141,7 @@ class Email {
             if($category === 'New Hire'){
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
-                $mail->Subject = "Support Hub New Hire Ticket Received - Ticket #$ticket_number";
+                $mail->Subject = "New MIS Ticket: Employee Onboarding - Ticket #$ticket_number ";
                 $mail->Body    = "
 <p style='font-size:16px;'>
     We've received your new hire support ticket and are working on it.
@@ -181,7 +181,7 @@ Senior Connection Center
             else if($category === 'Update SCC User'){
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "Support Hub Update SCC User Ticket Received - Ticket #$ticket_number";
+                $mail->Subject = "New MIS Ticket: Employee Role Change - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your update SCC user support ticket and are working on it.
@@ -225,7 +225,7 @@ Senior Connection Center
             else if($category === 'Termination'){
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "Support Hub Termination Ticket Received - Ticket #$ticket_number";
+                $mail->Subject = "New MIS Ticket: Termination - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your termination support ticket and are working on it.
@@ -257,7 +257,7 @@ Senior Connection Center
 
             }
             else{
-                $mail->Subject = "Support Hub Ticket Received - Ticket #$ticket_number";
+                $mail->Subject = "New MIS Ticket: $category - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your support ticket and are working on it.
@@ -325,7 +325,7 @@ Senior Connection Center
         if(!empty($user_manager)){
             $mail->addAddress($user_manager);
         }
-        $mail->Subject = "Support Hub Ticket Closed - Ticket #$ticket_number";
+        $mail->Subject = "Closed MIS Ticket: $category - Ticket #$ticket_number";
 
         if($category === 'New Hire' || $category === 'Update SCC User' || $category === 'Termination'){
 
@@ -345,7 +345,7 @@ Senior Connection Center
             //$mail->addAddress('laurie.rodriguez@sccmail.org');
                             $mail->Body    = "
 <p style='font-size:16px;'>
-We've received your update SCC user support ticket and are working on it.
+We've closed your support ticket and have marked it as resolved.
 </p>
 
 <p style='font-size:16px;'>
@@ -386,7 +386,7 @@ Senior Connection Center
 
             $mail->Body    = "
 <p style='font-size:16px;'>
-We've resolved your support ticket.
+We've closed your support ticket and have marked it as resolved.
 </p>
 
 <p style='font-size:16px;'>
@@ -442,6 +442,7 @@ Senior Connection Center
 // Execute the email cron job
 $emailSender = new Email();
 $emailSender->sendEmail();
+
 ?>
 
         
