@@ -29,7 +29,7 @@
 
 
 ?>
-<div class="card <?= $statusClass ?>"
+<div class="card ticket-card <?= $statusClass ?>"
      draggable="true"
      data-id="<?= htmlspecialchars($task['id']) ?>"
      data-category="<?= htmlspecialchars($task['category'] ?? '') ?>"

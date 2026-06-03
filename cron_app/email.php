@@ -117,6 +117,9 @@ class Email {
         $emailGroups = $emailInfo['emailGroups'] ?? '';
         $xDriveFolders = $emailInfo['xDriveFolders'] ?? '';
 
+        $nameOpen = explode('@', $user_email)[0];   // "firstname.lastname"
+        $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));  // "firstname lastname"
+
         
 
         $emailGroupsFormatted = '';
@@ -141,7 +144,7 @@ class Email {
             if($category === 'New Hire'){
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
-                $mail->Subject = "New MIS Ticket: Employee Onboarding - Ticket #$ticket_number ";
+                $mail->Subject = "New Ticket From: $displayOpenName - New Hire - Ticket #$ticket_number ";
                 $mail->Body    = "
 <p style='font-size:16px;'>
     We've received your new hire support ticket and are working on it.
@@ -181,7 +184,7 @@ Senior Connection Center
             else if($category === 'Update SCC User'){
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "New MIS Ticket: Employee Role Change - Ticket #$ticket_number";
+                $mail->Subject = "New Ticket From: $displayOpenName - Employee Update - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your update SCC user support ticket and are working on it.
@@ -225,7 +228,7 @@ Senior Connection Center
             else if($category === 'Termination'){
                 $mail->addAddress('laurie.rodriguez@sccmail.org');
                 $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "New MIS Ticket: Termination - Ticket #$ticket_number";
+                $mail->Subject = "New Ticket From: $displayOpenName - Termination - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your termination support ticket and are working on it.
@@ -317,6 +320,9 @@ Senior Connection Center
         $solution = $finishedEmailInfo['solution'] ?? '';
         $ticket_number = $finishedEmailInfo['ticket_num'] ?? '';
 
+        $nameOpen = explode('@', $user_email)[0];   // "firstname.lastname"
+        $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));  // "firstname lastname"
+
 
         $mail = $this->createMailer();
 
@@ -325,7 +331,7 @@ Senior Connection Center
         if(!empty($user_manager)){
             $mail->addAddress($user_manager);
         }
-        $mail->Subject = "Closed MIS Ticket: $category - Ticket #$ticket_number";
+        $mail->Subject = "Closed Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
 
         if($category === 'New Hire' || $category === 'Update SCC User' || $category === 'Termination'){
 
