@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function bindCardEvents() {
-  document.querySelectorAll('.card').forEach(card => {
+  document.querySelectorAll('.ticket-card').forEach(card => {
     // drag
     card.addEventListener('dragstart', e => {
       draggedCard = e.currentTarget;  // safer than e.target      
@@ -502,7 +502,9 @@ function openCardModal(card) {
           }
         });
 
-  new bootstrap.Modal(document.getElementById('viewTaskModal')).show();
+  const modalEl = document.getElementById('viewTaskModal');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
 }
 
 $(document).ready(function() {
