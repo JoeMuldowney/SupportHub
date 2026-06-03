@@ -1,0 +1,31 @@
+# lightweight official Python image
+FROM python:3.12-slim
+
+ENV POETRY_HOME="/opt/poetry" \
+    PATH="/opt/poetry/bin:$PATH" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl build-essential && rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL https://install.python-poetry.org | python -
+
+
+WORKDIR /app
+COPY data_dashboard/pyproject.toml /app/
+COPY data_dashboard/poetry.lock /app/
+
+
+RUN poetry install --no-interaction --no-ansi --no-root --only=main
+
+
+
+COPY data_dashboard/app.py /app/
+
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+
+EXPOSE 8000
+CMD ["python", "app.py"]
