@@ -8,3 +8,4 @@ phpunit.xml
 
 *.ini
 .phpunit.result.cache
+backups/

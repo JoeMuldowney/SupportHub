@@ -217,7 +217,7 @@
           <input type="text" name="supervisor" class="form-control" id="supervisor-add" required>
         </div>
         <div class="mb-3">
-          <label for="location">Office Cubicle*</label>
+          <label for="location">Office Cubicle* (Must be number only) toggling may be needed on the map link below</label>
           <input type="text" id="location" name="location" class="form-control"> <a href="http://sccintranet/apps/inventory/map/floorplan_view.odb" target="_blank">Click Here to View Floorplan</a>
         </div>
             <div class="mb-3">

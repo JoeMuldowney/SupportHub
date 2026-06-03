@@ -260,7 +260,7 @@ Senior Connection Center
 
             }
             else{
-                $mail->Subject = "New MIS Ticket: $category - Ticket #$ticket_number";
+                $mail->Subject = "New Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
 We've received your support ticket and are working on it.
