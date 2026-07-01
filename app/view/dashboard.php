@@ -89,15 +89,18 @@
           <select class="form-select" id="taskName" name="taskName" required>
             <option value="" disabled selected>Select an issue</option> 
             <option value="Account Access / Password Reset">Account Access / Password Reset</option>
-            <option value="Email (Gmail)">Email (Gmail)</option>
-            <option value="Phone System (Avaya)">Phone System (Avaya)</option>
-            <option value="eCIRTS">eCIRTS</option>
-            <option value="Hardware Problem">Hardware Problem</option>
-            <option value="Software Problem">Software Problem</option>
-            <option value="Network / Connectivity">Network / Connectivity</option>
             <option value="Audio / Video Issue">Audio / Video Issue</option>
-            <option value="Slow / Performance Issue">Slow / Performance Issue</option>
-            <option value="Request / New Setup">Request / New Setup</option>
+            <option value="DOTS">DOTS</option>
+            <option value="eCIRTS">eCIRTS</option>
+            <option value="Workspace">Google Workspace</option>
+            <option value="Hardware Problem">Hardware Problem</option>
+            <option value="Intranet">Intranet</option>
+            <option value="Microsoft Office">Microsoft Office</option>
+            <option value="Network / Connectivity">Network / Connectivity</option>
+            <option value="Phone System">Phone System</option>  
+            <option value="Slow / Performance Issue">Slow / Performance Issue</option>          
+            <option value="Software Problem">Software Problem</option>
+            <option value="X-Drive">X-Drive</option>                               
             <option value="Other">Other</option>
             </select>
         </div>              
@@ -208,7 +211,7 @@ Modal: View Ticket Details
   <div class="card mt-3">
     <div class="card-body">
       <p><strong>Images:</strong> <span id="viewImagesContainer"></span></p>
-      <p><strong>Description:</strong> <span id="viewDesc"></span></p>
+      <p><strong>Description:</strong><br> <span id="viewDesc" style="white-space: pre-wrap;"></span></p>
       <p><strong>Note:</strong> <span id="solutionProgress"></span></p>
     </div>
   </div>
@@ -466,7 +469,7 @@ function openCardModal(card) {
   document.getElementById('viewCategory').textContent   = card.dataset.category || '';
   document.getElementById('viewLocation').textContent   = card.dataset.location || '';
   document.getElementById('viewPriority').textContent   = card.dataset.priority || '';
-  document.getElementById('viewDesc').textContent       = card.dataset.desc || '';  
+  document.getElementById('viewDesc').innerHTML       = card.dataset.desc || ''; 
   document.getElementById('viewStatus').textContent     = card.dataset.status || '';
   document.getElementById('viewOpenedBy').textContent   = card.dataset.openedBy || '';
   document.getElementById('viewUpdatedBy').textContent  = card.dataset.updatedBy || '';
@@ -474,7 +477,7 @@ function openCardModal(card) {
   document.getElementById('viewDateOpened').textContent = card.dataset.dateOpened || '';
   document.getElementById('viewDateUpdated').textContent= card.dataset.dateUpdated || '';
   document.getElementById('viewDateClosed').textContent = card.dataset.dateClosed || '';
-  document.getElementById('solutionProgress').textContent = card.dataset.solution || '';
+  document.getElementById('solutionProgress').innerHTML = card.dataset.solution || '';
   
 
 /* Images stored server-side alias /images/ using custom 000-default.conf from absolute path /var/lib/tickets/data/ */
