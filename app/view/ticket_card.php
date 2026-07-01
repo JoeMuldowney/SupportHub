@@ -35,7 +35,7 @@
      data-category="<?= htmlspecialchars($task['category'] ?? '') ?>"
      data-location="<?= htmlspecialchars($task['location'] ?? '') ?>"
      data-priority="<?= htmlspecialchars($task['priority'] ?? '') ?>"
-     data-desc="<?= htmlspecialchars($task['user_desc'] ?? '') ?>"
+     data-desc="<?= htmlspecialchars(nl2br($task['user_desc'] ?? '')) ?>"
      data-status="<?= htmlspecialchars($task['status'] ?? $statusClass) ?>"
      data-opened-by="<?= htmlspecialchars($displayOpenName ) ?>"
      data-updated-by="<?= htmlspecialchars($displayUpdateName) ?>"
@@ -44,7 +44,7 @@
      data-date-updated="<?= htmlspecialchars($dateUpdated) ?>"
      data-date-closed="<?= htmlspecialchars($dateClosedF) ?>"
      data-images="<?= htmlspecialchars($ticket_images) ?>"
-     data-solution="<?= htmlspecialchars($task['solution'] ?? '') ?>"
+     data-solution="<?= htmlspecialchars(nl2br($task['solution'] ?? '')) ?>"
 >
   <div><?= htmlspecialchars($task['id'] ?? '') ?></div>
   <div><?= htmlspecialchars($task['location'] ?? '') ?></div>

@@ -314,7 +314,7 @@ class NewUserController{
     
       $id = (int)$_POST['deleteid'];
       $fname = $_POST['deletefname']; 
-      $lname = $_POST['deletefname'];
+      $lname = $_POST['deletelname'];
       $tDate = $_POST['termdate']; 
       $tTime = $_POST['termtime'];
       $user_email = $_SESSION['email'];

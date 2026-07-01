@@ -60,11 +60,22 @@
       <div class="d-flex align-items-center gap-2">
         <div class="input-group input-group-sm" style="width: 260px;">
           <span class="input-group-text">🔍</span>
+        <input type="text" class="form-control" id="filter-email" placeholder="Filter opened by email...">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+
+        <div class="input-group input-group-sm" style="width: 260px;">
+        <span class="input-group-text">🔍</span>
+        <input type="text" class="form-control" id="filter-category" placeholder="Filter by category...">
+        </div>
+        <div class="input-group input-group-sm" style="width: 260px;">
+          <span class="input-group-text">🔍</span>
+          
           <input
             type="text"
             class="form-control"
             id="search"
-            placeholder="Search requests..."
+            placeholder="Search description/solution..."
           >
         </div>
 
@@ -73,6 +84,8 @@
         </button>
       </div>
     </div>
+
+    
   </div>
 
   <div class="card-body p-0">
@@ -95,6 +108,7 @@
                 class="all-task-row"
                 data-id="<?= htmlspecialchars($task['id']) ?>"
                 data-status="<?= htmlspecialchars($task['status']) ?>"
+                data-category="<?= htmlspecialchars($task['category'] ?? '') ?>"
                 data-desc="<?= htmlspecialchars($task['user_desc']) ?? '' ?>"
                 data-solution="<?= htmlspecialchars($task['solution'] ?? '') ?>"
                 data-location="<?= htmlspecialchars($task['location'] ?? '') ?>"
@@ -250,6 +264,7 @@ Modal: View Ticket Details
         document.getElementById('viewPriority').textContent = row.dataset.priority || '';
         document.getElementById('viewDesc').textContent = row.dataset.desc || '';        
         document.getElementById('viewStatus').textContent = row.dataset.status || '';
+        document.getElementById('viewCategory').textContent = row.dataset.category || '';
         document.getElementById('viewOpenedBy').textContent = row.dataset.openedBy || '';
         document.getElementById('viewUpdatedBy').textContent = row.dataset.updatedBy || '';
         document.getElementById('viewClosedBy').textContent = row.dataset.closedBy || '';
@@ -323,14 +338,35 @@ Modal: View Ticket Details
     Performs case-insensitive substring match against row text.
 */
 $(document).ready(function () {
-    $("#search").on("keyup", function () {
-        var searchTerm = $(this).val().toLowerCase();
+    // Triggers whenever a user types in ANY filter input box
+    $("#filter-email, #filter-category, #search").on("keyup", function () {
+        
+        // Capture the current state of ALL filter inputs at this moment
+        var searchEmail = $("#filter-email").val().toLowerCase();
+        var filterCategory = $("#filter-category").val().toLowerCase();
+        var globalSearch = $("#search").val().toLowerCase();
+
+
+        // Loop through every row in the table
         $(".all-task-row").each(function () {
-            var text = $(this).text().toLowerCase();
-            if (text.indexOf(searchTerm) === -1) {
-                $(this).hide();
-            } else {
+            // Pull the required data attributes from the row
+            var rowEmail = ($(this).data("opened-by") || "").toString().toLowerCase(); // Adjust if email is stored in a different data attribute
+            var rowCategory = ($(this).data("category") || "").toString().toLowerCase();
+            var rowDesc = ($(this).data("desc") || "").toString().toLowerCase();
+            var rowSolution = ($(this).data("solution") || "").toString().toLowerCase();
+
+            // 4. Evaluate individual matching criteria
+            var matchesEmail = rowEmail.indexOf(searchEmail) !== -1;
+            var matchesCategory = rowCategory.indexOf(filterCategory) !== -1;
+            
+            // The global search matches if the text is found in either description OR solution
+            var matchesGlobal = rowDesc.indexOf(globalSearch) !== -1 || rowSolution.indexOf(globalSearch) !== -1;
+
+            // 5. The row must pass BOTH the email filter and the global search filter
+            if (matchesEmail && matchesCategory && matchesGlobal) {
                 $(this).show();
+            } else {
+                $(this).hide();
             }
         });
     });

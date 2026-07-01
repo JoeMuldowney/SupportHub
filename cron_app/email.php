@@ -260,6 +260,7 @@ Senior Connection Center
 
             }
             else{
+                $html_description = nl2br($description);
                 $mail->Subject = "New Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
                 $mail->Body    = "
 <p style='font-size:16px;'>
@@ -275,7 +276,7 @@ We've received your support ticket and are working on it.
 
 <p style='font-size:16px;'>
     <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$description</span>
+    <span style='font-size:16px;'>$html_description</span>
 </p>
         
 <p style='font-size:16px;'>
@@ -389,7 +390,8 @@ Senior Connection Center
 </p>";  
 }else {
                  
-
+$html_description = nl2br($description);
+$html_solution = nl2br($solution);
             $mail->Body    = "
 <p style='font-size:16px;'>
 We've closed your support ticket and have marked it as resolved.
@@ -403,12 +405,12 @@ We've closed your support ticket and have marked it as resolved.
 </p>
 <p style='font-size:16px;'>
     <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$description</span>
+    <span style='font-size:16px;'>$html_description</span>
 </p>
 
 <p style='font-size:16px;'>
     <span style='font-size:16px; font-weight:bold;'>Solution:</span><br>
-    <span style='font-size:16px;'>$solution</span>
+    <span style='font-size:16px;'>$html_solution</span>
 </p>
 
 <p style='font-size:16px;'>
