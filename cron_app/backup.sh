@@ -10,7 +10,7 @@ mysqldump \
   -u root \
   --skip-ssl \
   -p$(cat /run/secrets/db_root_pass) \
-  ticket_system_db > $BACKUP_DIR/db-$(date +%F-%H%M).sql
+  ticket_system_db > ../$BACKUP_DIR/db-$(date +%F-%H%M).sql
 
 # Images volume backup
 

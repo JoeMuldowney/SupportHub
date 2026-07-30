@@ -130,7 +130,7 @@ class TaskDB
                 $task->getPriority(),
                 $task->getStatus(),
                 $task->getUserDesc(),
-				$task->getDateCreated()->format('Y-m-d'), // format to string
+				$task->getDateCreated()->format('Y-m-d H:i:s'), // format to string
 				$task->getOpenedBy(),     // format to string
 				$task->getCategory(),                
                 $task->getManagerEmail(),
@@ -147,9 +147,10 @@ class TaskDB
             }
 
             if ($moreInfo && $ticketId && $sccUserId) {
+                $last_updated = (new DateTime())->format('Y-m-d H:i:s'); // Current timestamp
                 try {
-                    $stmt = $this->pdo->prepare('INSERT INTO comment_history (ticket_id, scc_id, commented_by, comment) VALUES (?, ?, ?, ?)');
-                    $stmt->execute([$ticketId, $sccUserId, $task->getOpenedBy(), $moreInfo]);
+                    $stmt = $this->pdo->prepare('INSERT INTO comment_history (ticket_id, scc_id, commented_by, comment, timestamp) VALUES (?, ?, ?, ?, ?)');
+                    $stmt->execute([$ticketId, $sccUserId, $task->getOpenedBy(), $moreInfo, $last_updated]);
 
                     $stmt = $this->pdo->prepare("
                         UPDATE task 
@@ -171,12 +172,13 @@ class TaskDB
             if ($ticketId) {
                 try{
 
+                    $last_updated = (new DateTime())->format('Y-m-d H:i:s'); // Current timestamp
                     $email_counter = 0;
                     $solution = '';
 
                       $stmt = $this->pdo->prepare("
-                    INSERT INTO email (user_email, supervisor_email, location, status, priority, user_desc, category, solution, email_counter, ticket_num, user_id)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    INSERT INTO email (user_email, supervisor_email, location, status, priority, user_desc, category, solution, email_counter, ticket_num, user_id, last_updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
 
                 $stmt->execute([
@@ -191,7 +193,8 @@ class TaskDB
                     $solution,
                     $email_counter,
                     $ticketId, // Pass the ticket ID to the email table
-                    $sccUserId // Pass the SCC user ID to the email table                    
+                    $sccUserId, // Pass the SCC user ID to the email table
+                    $last_updated // Pass the last updated timestamp to the email table
                 ]);             
 
 
@@ -324,7 +327,7 @@ class TaskDB
 
     if($status == 'new'){
 
-		$stmt = $this->pdo->prepare("SELECT t.*, i.name AS images FROM task t LEFT JOIN image i ON t.id = i.ticket_id WHERE t.status = ? ORDER BY Id DESC");
+		$stmt = $this->pdo->prepare("SELECT t.*, i.name AS images FROM task t LEFT JOIN image i ON t.id = i.ticket_id WHERE t.status = ? ORDER BY date_opened DESC");
 		$stmt->execute([$status]);
 		                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $tasks = [];
@@ -422,16 +425,19 @@ class TaskDB
     }
 
     try {
+        $last_updated = (new DateTime())->format('Y-m-d H:i:s'); // Current timestamp
         $stmt = $this->pdo->prepare("
             UPDATE email 
             SET solution = :solution,
-            status = :status
+            status = :status,
+            last_updated_at = :last_updated_at
             WHERE ticket_num = :ticket_num
         ");
 
             $stmt->execute([
             ':solution' => $solution,
             ':status'   => $status,
+            ':last_updated_at' => $last_updated,
             ':ticket_num' => $id
         ]);
     } catch (PDOException $e) {

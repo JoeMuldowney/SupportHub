@@ -46,10 +46,10 @@
      data-images="<?= htmlspecialchars($ticket_images) ?>"
      data-solution="<?= htmlspecialchars(nl2br($task['solution'] ?? '')) ?>"
 >
-  <div><?= htmlspecialchars($task['id'] ?? '') ?></div>
-  <div><?= htmlspecialchars($task['location'] ?? '') ?></div>
-  <div><?= htmlspecialchars($task['category'] ?? '') ?></div>
-  <div><?= htmlspecialchars($displayOpenName ?? '') ?></div>
+  <div><?= htmlspecialchars('Ticket: ' . ($task['id'] ?? '')) ?></div>
+  <div><?= htmlspecialchars("User: " . ($displayOpenName ?? '')) ?></div>
+  <div><?= htmlspecialchars("Category: " . ($task['category'] ?? '')) ?></div>
+  <div><?= htmlspecialchars("Assigned To: " . ($displayUpdateName ?? '')) ?></div>
 
 </div>
 

@@ -14,6 +14,7 @@
 
 require_once __DIR__ . '/../model/task_db.php';
 require_once __DIR__ . '/../model/task_model.php';
+require_once __DIR__ . '/../controller/botmessageservice.php';
 
 class TaskController
 {
@@ -112,7 +113,7 @@ class TaskController
             header("Location: /dashboard");
             exit;
         }          
-        $date_opened= (new DateTime())->format("Y-m-d");        
+        $date_opened = (new DateTime())->format('Y-m-d H:i:s');        
         $user_id = $_SESSION['user_id'];
         $user_email = $_SESSION['email'];
         $manager = $_SESSION['manager_email'] ?? '';        
@@ -192,14 +193,22 @@ class TaskController
 		$id = (int)($input['id'] ?? 0);
 		$status = trim($input['status'] ?? '');
         $user_role = (int)$_SESSION['role'];
+        $category = trim($input['subject'] ?? '');
+        $user = trim($input['user'] ?? '');
 
         
 		if ($id && in_array($status, ['new', 'inProgress', 'completed'])) {
             
             // Use the logged-in user email from session
             $updatedBy = $_SESSION['email'] ?? '';
-            $updatedDate = date('Y-m-d');
+            $adminEmail = explode('@', $updatedBy)[0];   // "firstname.lastname"
+            $displayAdminName = ucwords(str_replace('.', ' ', $adminEmail));  // "firstname lastname"
 
+            $updatedDate = (new DateTime())->format('Y-m-d H:i:s');
+            if ($status === 'inProgress'){
+                
+                sendDashboardAlert($displayAdminName, $id, $user, $category);
+            }
             if($status != 'completed'){
 			    (new TaskDB())->updateTaskStatus($id, $status, $updatedDate, $updatedBy);
 			    http_response_code(200);}
@@ -245,7 +254,7 @@ class TaskController
             header("Location: /dashboard");
             exit;
         }else{
-            (new TaskDB())->addTaskComment($id, $solution, $userEmail);
+            (new TaskDB())->addTaskSolution($id, $solution, $status, $userEmail);
             header("Location: /dashboard");
             exit;
         }

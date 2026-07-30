@@ -81,21 +81,15 @@ class Email {
     try{
 
     // Fetch all new tickets that haven't been emailed yet add group and xDrive info
-    $stmt = $this->pdo->prepare("SELECT e.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM email e LEFT JOIN groups_folders g ON e.user_id = g.user_id WHERE e.email_counter = ? AND e.status = ? GROUP BY e.id");
-    $stmt->execute([0,'new']);
-	$new_tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch completed tickets that need closure emails sent
-    $stmt = $this->pdo->prepare("SELECT e.* , GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM email e LEFT JOIN groups_folders g ON e.user_id = g.user_id WHERE e.email_counter = ? AND e.status = ? GROUP BY e.id");
-    $stmt->execute([1,'completed']);
-	$finished_tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $this->pdo->prepare("SELECT e.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM email e LEFT JOIN groups_folders g ON e.user_id = g.user_id WHERE (e.last_notified_at < e.last_updated_at) or e.last_notified_at IS NULL GROUP BY e.id");
+    $stmt->execute();
+	$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);   
     
     // If there are no tickets to process, log and return early
-    if (!$new_tickets && !$finished_tickets) {
-        error_log("No new or finished tickets found to send emails for");
+    if (!$tickets) {
+        error_log("No tickets found to send emails for");
         return;
     }
-
 
     }
     catch(PDOException $e) {
@@ -103,354 +97,160 @@ class Email {
             return null;
 
     }
-    // --- Process new ticket notifications ---
-    foreach ($new_tickets as $emailInfo) {
-        $user_email = $emailInfo['user_email'] ?? '';
-        $user_manager = $emailInfo['supervisor_email'] ?? '';
-        $location = $emailInfo['location'] ?? '';
-        $status = $emailInfo['status'] ?? '';
-        $priority = $emailInfo['priority'] ?? '';
-        $description = $emailInfo['user_desc'] ?? '';
-        $category = $emailInfo['category'] ?? '';
-        $solution = $emailInfo['solution'] ?? '';
-        $ticket_number = $emailInfo['ticket_num'] ?? '';
-        $emailGroups = $emailInfo['emailGroups'] ?? '';
-        $xDriveFolders = $emailInfo['xDriveFolders'] ?? '';
+    
 
-        $nameOpen = explode('@', $user_email)[0];   // "firstname.lastname"
-        $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));  // "firstname lastname"
+  // --- Process ticket notifications ---
+foreach ($tickets as $emailInfo) {
+    $emailId = $emailInfo['id'] ?? '';
+    $user_email = $emailInfo['user_email'] ?? '';
+    $user_manager = $emailInfo['supervisor_email'] ?? '';
+    $location = $emailInfo['location'] ?? '';
+    $status = $emailInfo['status'] ?? '';
+    $priority = $emailInfo['priority'] ?? '';
+    $description = $emailInfo['user_desc'] ?? '';
+    $category = $emailInfo['category'] ?? '';
+    $solution = $emailInfo['solution'] ?? '';
+    $ticket_number = $emailInfo['ticket_num'] ?? '';
+    $emailGroups = $emailInfo['emailGroups'] ?? '';
+    $xDriveFolders = $emailInfo['xDriveFolders'] ?? '';
 
-        
+    $nameOpen = explode('@', $user_email)[0];
+    $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));
 
-        $emailGroupsFormatted = '';
-        if (!empty($emailGroups)) {
-            $groupsArray = explode(',', $emailGroups);
-            $emailGroupsFormatted = implode("<br>", $groupsArray);
-        }
+    $emailGroupsFormatted = !empty($emailGroups) 
+        ? implode("<br>", explode(',', $emailGroups)) 
+        : '';
 
-        $xDriveFormatted = '';
-        if (!empty($xDriveFolders)) {
-            $foldersArray = explode(',', $xDriveFolders);
-            $xDriveFormatted = implode("<br>", $foldersArray);
-        }
+    $xDriveFormatted = !empty($xDriveFolders) 
+        ? implode("<br>", explode(',', $xDriveFolders)) 
+        : '';
 
-        $mail = $this->createMailer();
+    // Create fresh mailer instance per ticket
+    $mail = $this->createMailer();
+    
+    // Explicitly set primary recipient
+    if (!empty($user_email)) {
         $mail->addAddress($user_email);
+    }
+    
+    // Only add manager if different from user email
+    if (!empty($user_manager) && $user_manager !== $user_email) {
+        $mail->addAddress($user_manager);
+    }
 
-        if(!empty($user_manager)){
-            $mail->addAddress($user_manager);
-        }
-
-            if($category === 'New Hire'){
-                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
-                $mail->Subject = "New Ticket From: $displayOpenName - New Hire - Ticket #$ticket_number ";
-                $mail->Body    = "
-<p style='font-size:16px;'>
-    We've received your new hire support ticket and are working on it.
-</p>
-<p style='font-size:16px;'>
-<span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$formatted_desc</span>
-</p>
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
-    <span style='font-size:16px;'>$emailGroupsFormatted</span>
-</p>
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
-    <span style='font-size:16px;'>$xDriveFormatted</span>
-</p>
-
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";   
-
-            }
-            else if($category === 'Update SCC User'){
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
-                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "New Ticket From: $displayOpenName - Employee Update - Ticket #$ticket_number";
-                $mail->Body    = "
-<p style='font-size:16px;'>
-We've received your update SCC user support ticket and are working on it.
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$formatted_desc</span>
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
-    <span style='font-size:16px;'>$emailGroupsFormatted</span>
-</p>
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
-    <span style='font-size:16px;'>$xDriveFormatted</span>
-</p>
-
-            
-
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";  
-
-            }
-            else if($category === 'Termination'){
-                $mail->addAddress('laurie.rodriguez@sccmail.org');
-                $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-                $mail->Subject = "New Ticket From: $displayOpenName - Termination - Ticket #$ticket_number";
-                $mail->Body    = "
-<p style='font-size:16px;'>
-We've received your termination support ticket and are working on it.
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$formatted_desc</span>
-</p>
-
-            
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";    
-
-            }
-            else{
-                $html_description = nl2br($description);
-                $mail->Subject = "New Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
-                $mail->Body    = "
-<p style='font-size:16px;'>
-We've received your support ticket and are working on it.
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$html_description</span>
-</p>
-        
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";  
-                }   
-
-        try {
-            if($mail->send()){
-                error_log("Email sent successfully");
-
-                $updateStmt = $this->pdo->prepare("UPDATE email SET email_counter = ? WHERE id = ?");
-                $updateStmt->execute([1, $emailInfo['id']]);
-
-            }
-            
-            
-        } catch (Exception $e) {
-            error_log("Mailer error: " . $mail->ErrorInfo);
-            
-        }
-}
-
-
-
-    foreach ($finished_tickets as $finishedEmailInfo) {
-
-        $user_email = $finishedEmailInfo['user_email'] ?? '';
-        $user_manager = $finishedEmailInfo['supervisor_email'] ?? '';
-        $location = $finishedEmailInfo['location'] ?? '';
-        $status = $finishedEmailInfo['status'] ?? '';
-        $priority = $finishedEmailInfo['priority'] ?? '';
-        $description = $finishedEmailInfo['user_desc'] ?? '';
-        $category = $finishedEmailInfo['category'] ?? '';
-        $solution = $finishedEmailInfo['solution'] ?? '';
-        $ticket_number = $finishedEmailInfo['ticket_num'] ?? '';
-
-        $nameOpen = explode('@', $user_email)[0];   // "firstname.lastname"
-        $displayOpenName = ucwords(str_replace('.', ' ', $nameOpen));  // "firstname lastname"
-
-
-        $mail = $this->createMailer();
-
-        $mail->addAddress($user_email);
-
-        if(!empty($user_manager)){
-            $mail->addAddress($user_manager);
-        }
-        $mail->Subject = "Closed Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
-
-        if($category === 'New Hire' || $category === 'Update SCC User' || $category === 'Termination'){
-
-        $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
-        
-        $emailGroupsFormatted = '';
-        if (!empty($emailGroups)) {
-            $groupsArray = explode(',', $emailGroups);
-            $emailGroupsFormatted = implode("<br>", $groupsArray);
-        }
-
-        $xDriveFormatted = '';
-        if (!empty($xDriveFolders)) {
-            $foldersArray = explode(',', $xDriveFolders);
-            $xDriveFormatted = implode("<br>", $foldersArray);
-        }
-            //$mail->addAddress('laurie.rodriguez@sccmail.org');
-                            $mail->Body    = "
-<p style='font-size:16px;'>
-We've closed your support ticket and have marked it as resolved.
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$formatted_desc</span>
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Email Groups:</span><br>
-    <span style='font-size:16px;'>$emailGroupsFormatted</span>
-</p>
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>X Drive Folders:</span><br>
-    <span style='font-size:16px;'>$xDriveFormatted</span>
-</p>
-
-            
-
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";  
-}else {
-                 
-$html_description = nl2br($description);
-$html_solution = nl2br($solution);
+    // --- STATUS: NEW ---
+    if ($status === 'new') {
+        if ($category === 'New Hire') {
+            $mail->addAddress("laurie.rodriguez@sccmail.org");
+            $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+            $mail->Subject = "New Ticket From: $displayOpenName - New Hire - Ticket #$ticket_number";
             $mail->Body    = "
-<p style='font-size:16px;'>
-We've closed your support ticket and have marked it as resolved.
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:18px; font-weight:bold;'>Ticket details:</span><br>
-    Category: $category<br>
-    Location: $location<br>
-    Priority: $priority
-</p>
-<p style='font-size:16px;'>
-    <span style='font-size:16px; font-weight:bold;'>Description:</span><br>
-    <span style='font-size:16px;'>$html_description</span>
-</p>
-
-<p style='font-size:16px;'>
-    <span style='font-size:16px; font-weight:bold;'>Solution:</span><br>
-    <span style='font-size:16px;'>$html_solution</span>
-</p>
-
-<p style='font-size:16px;'>
-You can log in to your account to view the ticket details and updates: http://sccapps6/dashboard
-</p>
-<p style='font-size:16px;'>
-Thank you for using Support Hub.
-</p>
-<p style='font-size:16px;'>
-MIS Department
-Senior Connection Center
-</p>";    
-}
-        try {
-            // Attempt to send email
-            if($mail->send()){
-                error_log("Email sent successfully");
-
-                // Update email_counter so we don't resend the same notification
-                $updateStmt = $this->pdo->prepare("UPDATE email SET email_counter = ? WHERE id = ?");
-                $updateStmt->execute([2, $finishedEmailInfo['id']]);
-
-            }
-            
-            
-        } catch (Exception $e) {
-            // Log any PHPMailer errors
-            error_log("Mailer error: " . $mail->ErrorInfo);
-            
+            <p style='font-size:16px;'>We've received your new hire support ticket and are working on it.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$formatted_desc</p>
+            <p style='font-size:16px;'><b>Email Groups:</b><br>$emailGroupsFormatted</p>
+            <p style='font-size:16px;'><b>X Drive Folders:</b><br>$xDriveFormatted</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        } else if ($category === 'Update SCC User') {
+            $mail->addAddress("laurie.rodriguez@sccmail.org");
+            $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+            $mail->Subject = "New Ticket From: $displayOpenName - Employee Update - Ticket #$ticket_number";
+            $mail->Body    = "
+            <p style='font-size:16px;'>We've received your update SCC user support ticket and are working on it.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$formatted_desc</p>
+            <p style='font-size:16px;'><b>Email Groups:</b><br>$emailGroupsFormatted</p>
+            <p style='font-size:16px;'><b>X Drive Folders:</b><br>$xDriveFormatted</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        } else if ($category === 'Termination') {
+            $mail->addAddress("laurie.rodriguez@sccmail.org");
+            $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+            $mail->Subject = "New Ticket From: $displayOpenName - Termination - Ticket #$ticket_number";
+            $mail->Body    = "
+            <p style='font-size:16px;'>We've received your termination support ticket and are working on it.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$formatted_desc</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        } else {
+            $html_description = nl2br($description);
+            $mail->Subject = "New Ticket From: $displayOpenName - $category - Ticket #$ticket_number";
+            $mail->Body    = "
+            <p style='font-size:16px;'>We've received your support ticket and are working on it.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$html_description</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
         }
-}
+    } 
+    // --- STATUS: IN PROGRESS ---
+    else if ($status === 'inProgress') {
+        $html_solution = nl2br($solution);
+        
+        // FIX: Added Subject Line
+        $mail->Subject = "Ticket Updated: #$ticket_number - $category ($displayOpenName)";
 
+        if (in_array($category, ['New Hire', 'Update SCC User', 'Termination'])) {
+            $mail->addAddress("laurie.rodriguez@sccmail.org");
+            $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+            $mail->Body    = "
+            <p style='font-size:16px;'>We've updated your support ticket.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$formatted_desc</p>
+            <p style='font-size:16px;'><b>Email Groups:</b><br>$emailGroupsFormatted</p>
+            <p style='font-size:16px;'><b>X Drive Folders:</b><br>$xDriveFormatted</p>
+            <p style='font-size:16px;'><b>Solution / Update:</b><br>$html_solution</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        } else {
+            $html_description = nl2br($description);
+            $mail->Body    = "
+            <p style='font-size:16px;'>We've updated your support ticket.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$html_description</p>
+            <p style='font-size:16px;'><b>Solution / Update:</b><br>$html_solution</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        }
+    } 
+    // --- STATUS: COMPLETED ---
+    else if ($status === 'completed') {
+        $html_solution = nl2br($solution);
+        
+        // FIX: Added Subject Line
+        $mail->Subject = "Ticket Completed: #$ticket_number - $category ($displayOpenName)";
 
+        if (in_array($category, ['New Hire', 'Update SCC User', 'Termination'])) {
+            $mail->addAddress("laurie.rodriguez@sccmail.org");
+            $formatted_desc = preg_replace('/(?<!^)([A-Z][A-Za-z ]+:)/', "<br>$1", $description);
+            $mail->Body    = "
+            <p style='font-size:16px;'>Your support ticket has been completed.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$formatted_desc</p>
+            <p style='font-size:16px;'><b>X Drive Folders:</b><br>$xDriveFormatted</p>
+            <p style='font-size:16px;'><b>Solution:</b><br>$html_solution</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        } else {
+            $html_description = nl2br($description);
+            $mail->Body    = "
+            <p style='font-size:16px;'>Your support ticket has been completed.</p>
+            <p style='font-size:16px;'><b>Ticket details:</b><br>Category: $category<br>Location: $location<br>Priority: $priority</p>
+            <p style='font-size:16px;'><b>Description:</b><br>$html_description</p>
+            <p style='font-size:16px;'><b>Solution:</b><br>$html_solution</p>
+            <p style='font-size:16px;'>Dashboard: http://sccapps6/dashboard</p>";
+        }
+    }
+
+    // Send the email and update timestamp
+    try {
+        if ($mail->send()) {
+            error_log("Email sent successfully for Ticket #$ticket_number");
+            $last_notified_at = (new DateTime())->format('Y-m-d H:i:s'); // Current timestamp
+            $updateStmt = $this->pdo->prepare("UPDATE email SET last_notified_at = ? WHERE id = ?");
+            $updateStmt->execute([$last_notified_at, $emailId]);
+        }
+    } catch (Exception $e) {
+        error_log("Mailer error for Ticket #$ticket_number: " . $mail->ErrorInfo);
     }
 }
-
+    }}
 // Execute the email cron job
 $emailSender = new Email();
 $emailSender->sendEmail();
-
 ?>
-
-        
