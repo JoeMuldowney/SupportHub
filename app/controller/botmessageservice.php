@@ -1,9 +1,17 @@
 <?php
 
+    if (!function_exists('readSecret')) {
+            function readSecret(string $path): string {
+                if (!file_exists($path)) {
+                    throw new Exception("Secret file not found: $path");
+                }
+                return trim(file_get_contents($path));
+            }
+        }
+
 function sendDashboardAlert($assignedTo, $ticketId, $ticketUser, $category){
     
-    $webhookUrl = "https://chat.googleapis.com/v1/spaces/AAAA5AoEQpA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=lp0jQ1t3HTWjy9CJ5fgx6l3D2Xewk-kgurpNRhJED_w";
-
+    $webhookUrl = readSecret('./secrets/chat_hook_url');
     // 2. Format your text message (Google Chat supports basic markdown like *bold* and _italics_)
     $messageText = "Ticket has been assigned to " . $assignedTo . " for " . $ticketUser . " (Ticket ID: " . $ticketId . " Category: " . $category . ")\n";
 
