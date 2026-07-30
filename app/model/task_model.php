@@ -146,17 +146,17 @@ class Task
 
     public function setDateCreated(DateTime $date_opened): void
     {
-        $this->date_opened = $date_opened->format("Y-m-d");
+        $this->date_opened = $date_opened->format('Y-m-d H:i:s');
     }
 
     public function setDateUpdated(?DateTime $date_updated): void
     {
-        $this->date_updated = $date_updated?->format("Y-m-d");
+        $this->date_updated = $date_updated?->format('Y-m-d H:i:s');
     }
 
     public function setDateClosed(?DateTime $date_closed): void
     {
-        $this->date_closed = $date_closed?->format("Y-m-d");
+        $this->date_closed = $date_closed?->format('Y-m-d H:i:s');
     }
 
     public function setSolution(?string $solution): void

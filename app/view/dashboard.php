@@ -403,6 +403,8 @@ function bindColumnDnd() {
         }
 
       const id = draggedCard.dataset.id;
+      const User = draggedCard.dataset.openedBy;
+      const subject = draggedCard.dataset.category;
       let newStatus = '';
       switch (column.id) {
         case 'todo':       newStatus = 'new';        break;
@@ -420,7 +422,7 @@ function bindColumnDnd() {
       fetch('/ticket/updateStatus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: id, status: newStatus })
+        body: JSON.stringify({ id: id, status: newStatus, user: User, subject: subject })
       })
       .then(res => {
         if (!res.ok) throw new Error('Failed to update');
@@ -434,7 +436,7 @@ function bindColumnDnd() {
             draggedCard.classList.add('todo');
             break;
           case 'inProgress':
-            draggedCard.classList.add('inprogress');
+            draggedCard.classList.add('inprogress');            
             break;
           case 'completed':
             draggedCard.classList.add('done');
@@ -735,6 +737,8 @@ document.getElementById('viewTaskModal').addEventListener('hidden.bs.modal', fun
     document.getElementById("addBtn").style.display = "inline-block";
 
 });
+
+
 </script>
 </body>
 </html>

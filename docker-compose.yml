@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80" # map host port 80 to container port 80
     volumes:
-      - .:/var/www/html # mount local app directory to container for live code updates
+      # - .:/var/www/html # mount local app directory to container for live code updates
       # Persistent storage for uploaded ticket images
       - stored_images:/var/lib/tickets/data
        # Secret files for database credentials
@@ -35,7 +35,7 @@ services:
       # Persistent storage stored locally for backup files created by cron job
       # will be mounted to /opt/backups in container and can be accessed on host at ./backups
       # synced with google drive folder for offsite backup
-      - ./backups:/opt/backups
+      - ../backups:/opt/backups
        # Secret files for database credentials
       - ./secrets/db_pass:/run/secrets/db_pass:ro
       - ./secrets/db_host:/run/secrets/db_host:ro
