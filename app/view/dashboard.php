@@ -19,6 +19,9 @@
       <span class="navbar-text text-white me-3">
         Welcome <?= htmlspecialchars($_SESSION['fname'] ?? '') ?>!
       </span>
+        <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 3): ?>
+        <a class="btn btn btn-outline-warning" href="/history">History</a>
+      <?php endif; ?>
       <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 3): ?>
         <a class="btn btn-outline-warning me-2" href="/admin">MIS</a>
       <?php endif; ?>

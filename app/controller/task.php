@@ -128,7 +128,7 @@ class TaskController
                 $counter = 0;
                 foreach ($_FILES['image']['name'] as $i => $name) {
                     if ($_FILES['image']['error'][$i] !== UPLOAD_ERR_OK) continue;
-                        $allowedExtensions = ["jpg", "jpeg", "png", "pdf"];
+                        $allowedExtensions = ["jpg", "jpeg", "png", "pdf", "xlsx", "csv", "doc", "docx"];
                         $originalName = $_FILES['image']['name'][$i];
                         $fileExtension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
 
