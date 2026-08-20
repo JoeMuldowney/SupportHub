@@ -248,6 +248,26 @@ class NewUserDB{
 
             return $rows;
 	}
+    public function getAllNewUsersByDeptForADRCManager(): ?array
+	{
+		$stmt = $this->pdo->prepare("SELECT u.*, GROUP_CONCAT(g.email) AS emailGroups, GROUP_CONCAT(g.xdrive) AS xDriveFolders FROM scc_user u LEFT JOIN groups_folders g ON u.id = g.user_id WHERE u.dept = ? OR u.dept = ? OR u.dept = ? GROUP BY u.id ORDER BY u.id DESC;");
+		$stmt->execute(['ADRC', 'LTC', 'I&R']);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: null;
+            if ($rows) {
+                foreach ($rows as &$row) {
+                    // Convert comma-separated strings to arrays
+                    $row['emailGroups'] = $row['emailGroups']
+                        ? explode(',', $row['emailGroups'])
+                        : [];
+
+                    $row['xDriveFolders'] = $row['xDriveFolders']
+                        ? explode(',', $row['xDriveFolders'])
+                        : [];
+                }
+            }
+
+            return $rows;
+	}
 
         /**
      * Retrieves all users for a specific department.

@@ -50,8 +50,14 @@ class ManagerController{
         } 
         if ($_SESSION['role'] === 1) {
             $dept = $_SESSION['dept'];
+
+            if ($_SESSION['email'] === 'lauren.cury@sccmail.org'){
+                 $users = (new NewUserDB)->getAllNewUsersByDeptForADRCManager() ?? [];
+
+            }else{
         
             $users = (new NewUserDB)->getAllNewUsersByDept($dept) ?? [];
+            }
             
         }
 
