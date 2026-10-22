@@ -11,7 +11,7 @@
 
 function sendDashboardAlert($assignedTo, $ticketId, $ticketUser, $category){
     
-    $webhookUrl = readSecret('./secrets/chat_hook_url');
+    $webhookUrl = readSecret('/run/secrets/chat_hook_url');
     // 2. Format your text message (Google Chat supports basic markdown like *bold* and _italics_)
     $messageText = "Ticket has been assigned to " . $assignedTo . " for " . $ticketUser . " (Ticket ID: " . $ticketId . " Category: " . $category . ")\n";
 
